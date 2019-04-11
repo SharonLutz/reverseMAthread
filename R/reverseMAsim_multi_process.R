@@ -2,7 +2,16 @@ library(tictoc)
 source("R/multi_process_mediate.R")
 reverseMAsimMultiProcess <-
 function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,0.2),varY=1,
-                         nSim=100,nSimImai=1000,SEED=1,plot.pdf=T,plot.name="reverseMAsim.pdf",alpha_level=0.05){
+                         nSim=100,nSimImai=1000,SEED=1,plot.pdf=T,plot.name="reverseMAsim.pdf",alpha_level=0.05, num_cores=getOption("mediate.cores", detectCores() - 1)){
+  if(detectCores() == 1){
+    warning("your machine may not be suitable for multiprocessing, only 1 core was detected")
+  }
+  if(num_cores < 2){
+    warning(paste("forced num_cores to 2 from value of"), num_cores)
+    num_cores=2
+  }
+  
+  options(mediate.cores = num_cores)
   
   if(alpha_level>1 | alpha_level<0){stop("Error: alpha_level must be between 0 and 1")}
   if(length(nSimImai) != 1){stop ("Error: nSimImai must be a single integer value")}
