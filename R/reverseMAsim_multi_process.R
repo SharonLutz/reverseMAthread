@@ -1,3 +1,4 @@
+library(tictoc)
 source("R/multi_process_mediate.R")
 reverseMAsimMultiProcess <-
 function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,0.2),varY=1,
@@ -34,18 +35,22 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
   #generate the data needed to make linear models.
   data_matrix = generateDataMatrix(med_vars)
   print("running mediation on forward models")
+  tic("forward models")
   med.out.matrix = mediate_parallel(data_matrix, nSimImai)
-  print("running mediation on reverse models")
+  toc()
+  
   data_matrix_reversed = reverseDataMatrix(data_matrix)
   rm(data_matrix)
-  print("mediation runs completed, processing results")
   
+  print("running mediation on reverse models")
+  tic("reverse models")
   med.outR.matrix = mediate_parallel(data_matrix_reversed, nSimImai)
+  toc()
   rm(data_matrix_reversed)
   
-  
+  print("mediation runs completed, processing results")
   for(i in 1:nSim){
-    if(floor(i/10)==ceiling(i/10)){print(paste(i,"of",nSim,"simulations"))}
+    #if(floor(i/10)==ceiling(i/10)){print(paste(i,"of",nSim,"simulations"))}
       
     # Create matrix to store the results
     mat_results <- matrix(0,nrow=length(betaM),ncol=4)
@@ -62,8 +67,8 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
       if(pval_indirect<alpha_level){mat_results[bM.ind,"IndirectNR"] <- mat_results[bM.ind,"IndirectNR"]+1 }
       
       # Get the direct and indirect effects
-      pval_direct_r <- med.outR.matrix[[bM.ind,i]]@pval_direct_r
-      pval_indirect_r <- med.outR.matrix[[bM.ind,i]]@pval_indirect_r
+      pval_direct_r <- med.outR.matrix[[bM.ind,i]]@pval_direct
+      pval_indirect_r <- med.outR.matrix[[bM.ind,i]]@pval_indirect
       
       # Add to the matrix
       if(pval_direct_r<alpha_level){mat_results[bM.ind,"DirectR"] <- mat_results[bM.ind,"DirectR"]+1 }
@@ -71,12 +76,12 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
       
     } # End of bM.ind
     
-    rm(med.out.matrix)
-    rm(med.outR.matrix)
-    
     mat_total <- mat_total+mat_results
     
   } # End of nSim
+  
+  rm(med.out.matrix)
+  rm(med.outR.matrix)
   
   mat_total <- mat_total/nSim
   
