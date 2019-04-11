@@ -8,6 +8,9 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
   if(length(nSimImai) != 1){stop ("Error: nSimImai must be a single integer value")}
   if(nSimImai<0 | nSimImai==0 | floor(nSimImai)!=ceiling(nSimImai) ){stop("Error: n must be an integer greater than or equal to 1")}
   
+  # Set the seed.
+  set.seed(SEED)
+  
   #other values will be checked by the validator of the class
   med_vars = MediateVariables(
     n = n,
@@ -22,15 +25,8 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
     nSim=nSim
   )
   
-  # Set the seed.
-  set.seed(SEED)
-  
   mat_total <- matrix(0,nrow=length(betaM),ncol=4)
   colnames(mat_total) <- c("DirectNR","IndirectNR","DirectR","IndirectR")
-  #need to make a list of input vars instead of doing all this work from the outset
-  # there will be nSim loops, iterating over the length of betaM
-  
-  variable_lists = vector("list", length(betaM))
   
   #generate the data needed to make linear models.
   data_matrix = generateDataMatrix(med_vars)
