@@ -6,11 +6,14 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
   # Set the seed.
   set.seed(SEED)
   
+  next_seed = SEED + 1
+  g_env = globalenv()
+  data_gen_randstate = g_env[[".Random.seed"]]
   # Error checks
-  if(n<0 | n==0 | floor(n)!=ceiling(n) ){stop("Error: n must be an integer greater than or equal to 1")}
+  if(n<=0 || floor(n)!=ceiling(n) ){stop("Error: n must be an integer greater than or equal to 1")}
   if(pX<0 | pX>1){stop("Error: pX must be greater than 0 and less than 1")}
-  if(!varM>0){stop("Error: varM must be greater than 0")}
-  if(!varY>0){stop("Error: varY must be greater than 0")}
+  if(varM<=0){stop("Error: varM must be greater than 0")}
+  if(varY<=0){stop("Error: varY must be greater than 0")}
   if(length(unique(betaM))!=length(betaM)){stop("Error: betaM must contain unique values")}
   if(length(betaM)<2){stop("Error: betaM must be a vector with at least two values")}
   if(alpha_level>1 | alpha_level<0){stop("Error: alpha_level must be between 0 and 1")}
@@ -27,10 +30,17 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
     
     for(bM.ind in 1:length(betaM)){
       # Generate the data
+      
+      g_env[[".Random.seed"]] = data_gen_randstate
+      
       X <- rbinom(n,2,pX)
       M <- rnorm(n,gamma0 + gammaX*X,sqrt(varM))
       Y <- rnorm(n,beta0 + betaX*X + betaM[bM.ind]*M,sqrt(varY))
       
+      data_gen_randstate = g_env[[".Random.seed"]]
+      
+      set.seed(next_seed)
+      next_seed = next_seed + 1
       # Fit the mediation model
       med.fit <- (lm(M~X))
       out.fit <- (lm(Y~X+M))

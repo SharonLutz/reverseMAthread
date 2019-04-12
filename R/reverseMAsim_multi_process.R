@@ -18,10 +18,10 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
   
   if(alpha_level>1 | alpha_level<0){stop("Error: alpha_level must be between 0 and 1")}
   if(length(nSimImai) != 1){stop ("Error: nSimImai must be a single integer value")}
-  if(nSimImai<0 | nSimImai==0 | floor(nSimImai)!=ceiling(nSimImai) ){stop("Error: n must be an integer greater than or equal to 1")}
+  if(nSimImai<=0 || floor(nSimImai)!=ceiling(nSimImai) ){stop("Error: n must be an integer greater than or equal to 1")}
   
   #other values will be checked by the validator of the class
-  med_vars = MediateVariables(
+  med_vars = MediateDataGenerationParameters(
     n = n,
     pX = pX,
     gamma0 = gamma0,
@@ -38,22 +38,14 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
   colnames(mat_total) <- c("DirectNR","IndirectNR","DirectR","IndirectR")
   
   #generate the data needed to make linear models.
-  data_matrix = generateDataMatrix(med_vars)
-  print("running mediation on forward models")
-  tic("forward models")
-  med.out.matrix = mediate_parallel(data_matrix, nSimImai)
+  data_matrix = generateDataMatrix(med_vars, SEED)
+  print("running mediation on models")
+  tic("mediation")
+  result.matrix = mediate_parallel(data_matrix, nSimImai)
   toc()
-  
-  data_matrix_reversed = reverseDataMatrix(data_matrix)
   rm(data_matrix)
   
-  print("running mediation on reverse models")
-  tic("reverse models")
-  med.outR.matrix = mediate_parallel(data_matrix_reversed, nSimImai)
-  toc()
-  rm(data_matrix_reversed)
-  
-  print("mediation runs completed, processing results")
+  print("processing results")
   for(i in 1:nSim){
     #if(floor(i/10)==ceiling(i/10)){print(paste(i,"of",nSim,"simulations"))}
       
@@ -64,16 +56,16 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
     for(bM.ind in 1:length(betaM)){
       
       # Get the direct and indirect effects
-      pval_direct <- med.out.matrix[[bM.ind,i]]@pval_direct
-      pval_indirect <- med.out.matrix[[bM.ind,i]]@pval_indirect
+      pval_direct <- result.matrix[[bM.ind,i]]@pval_direct
+      pval_indirect <- result.matrix[[bM.ind,i]]@pval_indirect
       
       # Add to the matrix
       if(pval_direct<alpha_level){mat_results[bM.ind,"DirectNR"] <- mat_results[bM.ind,"DirectNR"]+1 }
       if(pval_indirect<alpha_level){mat_results[bM.ind,"IndirectNR"] <- mat_results[bM.ind,"IndirectNR"]+1 }
       
       # Get the direct and indirect effects
-      pval_direct_r <- med.outR.matrix[[bM.ind,i]]@pval_direct
-      pval_indirect_r <- med.outR.matrix[[bM.ind,i]]@pval_indirect
+      pval_direct_r <- result.matrix[[bM.ind,i]]@pval_direct_r
+      pval_indirect_r <- result.matrix[[bM.ind,i]]@pval_indirect_r
       
       # Add to the matrix
       if(pval_direct_r<alpha_level){mat_results[bM.ind,"DirectR"] <- mat_results[bM.ind,"DirectR"]+1 }
@@ -85,8 +77,7 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
     
   } # End of nSim
   
-  rm(med.out.matrix)
-  rm(med.outR.matrix)
+  rm(result.matrix)
   
   mat_total <- mat_total/nSim
   

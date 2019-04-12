@@ -12,7 +12,7 @@ test_single_core <- function(n_times){
 
 test_n_cores_k_jobs <- function(n, k){
   g_env = globalenv()
-  med_vars = MediateVariables(nSim=k)
+  med_vars = MediateDataGenerationParameters(nSim=k)
   sim_args = generateDataMatrix(med_vars)
   g_env[["med_vars"]] = med_vars
   g_env[["sim_args"]] = sim_args
@@ -24,7 +24,7 @@ test_n_cores_k_jobs <- function(n, k){
   return(result_list)
 }
 
-cores_to_test <- 1
+cores_to_test <- 3
 
 #test_single_core(cores_to_test)
 result = test_n_cores_k_jobs(cores_to_test, cores_to_test)
