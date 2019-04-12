@@ -7,7 +7,7 @@ Encoding: UTF-8
 Authors@R: c(
     person("Annie", "Thwing", email="annie.thwing@ucdenver.edu", role=c("cre","aut")),
     person("Sharon", "Lutz", role=c("aut")),
-    person("Michael", "Gooch", email="goochmi@gmail.com", role=c("ctb"))
+    person("Michael", "Gooch", email="goochmi@gmail.com", role=c("ctb","aut"))
     )
 Description: This package contains methods to run mediation analysis and MR with reverse causality. It contains functions to simulate the performance of mediation analysis and three MR methods (Egger regression, IVW and median) and functions which provide estimates and p-values of direct and indirect effects given a dataset.
 License: GPL-2
@@ -26,6 +26,7 @@ Collate:
     'mediate_s4_classes.R'
     'multi_process_mediate.R'
     'reverseC-internal.R'
+    'reverseC.R'
     'reverseMAdata.R'
     'reverseMAsim.R'
     'reverseMAsim_multi_process.R'
