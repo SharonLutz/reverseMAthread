@@ -1,9 +1,19 @@
 Package: reverseC
 Type: Package
 Title: This package contains methods to run mediation analysis and MR with reverse causality
-Version: 1.0
+Version: 1.1
 Date: 2018-05-14
-Author: Sharon Lutz, Annie Thwing
-Maintainer: Annie Thwing <annie.thwing@ucdenver.edu>
+Authors@R: c(
+    person("Annie", "Thwing", email="annie.thwing@ucdenver.edu", role=c("cre","aut")),
+    person("Sharon", "Lutz", role=c("aut")),
+    person("Michael", "Gooch", role=c("ctb"))
+    )
 Description: This package contains methods to run mediation analysis and MR with reverse causality. It contains functions to simulate the performance of mediation analysis and three MR methods (Egger regression, IVW and median) and functions which provide estimates and p-values of direct and indirect effects given a dataset.
 License: GPL-2
+Depends: R (>= 3.5.1)
+Imports: 
+    mediation,
+    snow,
+    MendelianRandomization
+URL: https://github.com/SharonLutz/reverseC
+BugReports: https://github.com/SharonLutz/reverseC/issues
