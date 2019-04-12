@@ -1,12 +1,13 @@
-library(tictoc)
-source("R/multi_process_mediate.R")
+#' @include mediate_s4_classes.R multi_process_mediate.R
+
+#' @export
 reverseMAsimMultiProcess <-
 function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,0.2),varY=1,
-                         nSim=100,nSimImai=1000,SEED=1,plot.pdf=T,plot.name="reverseMAsim.pdf",alpha_level=0.05, num_cores=getOption("mediate.cores", detectCores() - 1)){
+                         nSim=100,nSimImai=1000,SEED=1,plot.pdf=T,plot.name="reverseMAsim.pdf",alpha_level=0.05, num_cores=getOption("mediate.cores", parallel::detectCores() - 1)){
   # Set the seed.
   set.seed(SEED)
   
-  if(detectCores() == 1){
+  if(parallel::detectCores() == 1){
     warning("your machine may not be suitable for multiprocessing, only 1 core was detected")
   }
   if(num_cores < 2){
@@ -40,9 +41,9 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
   #generate the data needed to make linear models.
   data_matrix = generateDataMatrix(med_vars, SEED)
   print("running mediation on models")
-  tic("mediation")
+  tictoc::tic("mediation")
   result.matrix = mediate_parallel(data_matrix, nSimImai)
-  toc()
+  tictoc::toc()
   rm(data_matrix)
   
   print("processing results")

@@ -1,8 +1,6 @@
-source("R/mediate_variables_class.R")
-suppressMessages(library(parallel))
+#' @include mediate_s4_classes.R
 
 simulate_and_mediate <- function(med_model_vars){
-  suppressMessages(library(mediation))
   #my test begins here
   
   models <- assembleLinearModels(med_model_vars)
@@ -10,8 +8,8 @@ simulate_and_mediate <- function(med_model_vars){
   # Fit the mediation model
   set.seed(med_model_vars@SEED)
   
-  med.out <- mediate(models@med.fit, models@out.fit, treat = "X",mediator = "M1",sims = nSimImai)
-  med.out.r <- mediate(models@med.fit.r, models@out.fit.r, treat = "X",mediator = "M2",sims = nSimImai)
+  med.out <- mediation::mediate(models@med.fit, models@out.fit, treat = "X",mediator = "M1",sims = nSimImai)
+  med.out.r <- mediation::mediate(models@med.fit.r, models@out.fit.r, treat = "X",mediator = "M2",sims = nSimImai)
   
   summary_obj = summary(med.out)
   summary_obj.r = summary(med.out.r)
@@ -25,7 +23,6 @@ simulate_and_mediate <- function(med_model_vars){
 }
 
 if (.Platform$OS.type == "unix") {
-  library(parallel)
   mediate_parallel <- function(list_of_job_args, nSimImai=1000){
     g_env = globalenv()
     if(exists("nSimImai", envir = g_env)){
@@ -36,7 +33,7 @@ if (.Platform$OS.type == "unix") {
     g_env[["nSimImai"]]=nSimImai
     options(mc.cores = getOption("mediate.cores", detectCores() - 1))
     # TODO: make sure nSimImai value exists for all processes created by mclapply
-    result <- mclapply(list_of_job_args, simulate_and_mediate, mc.silent = TRUE)
+    result <- parallel::mclapply(list_of_job_args, simulate_and_mediate, mc.silent = TRUE)
     attr(result, "dim") <- dim(list_of_job_args)
     if(is.null(old_nSimImai)){
       rm("nSimImai", envir=g_env)
@@ -46,22 +43,29 @@ if (.Platform$OS.type == "unix") {
     return(result)
   }
 }else{
-  suppressMessages(library(snow))
-  
   #wrap input args somehow into a list to supply to cluster nodes
   #ensure the function called will return all required information wrapped up so it will fit in a list
   #maybe could use environment objects....
   mediate_parallel <- function(list_of_job_args, nSimImai=1000){
     num_cores <- getOption("mediate.cores", detectCores() - 1)
     options(cl.cores = num_cores)
-    this.cluster <- makeCluster(num_cores)
-    on.exit(stopCluster(this.cluster))
-    clusterCall(cl=this.cluster,function(){suppressMessages(source("R/mediate_variables_class.R"))})
-    clusterExport(cl=this.cluster,c("nSimImai"),envir=environment())
+    this.cluster <- snow::makeCluster(num_cores)
+    on.exit(snow::stopCluster(this.cluster))
+    #make sure reverseC is loaded on the nodes
+    if(pkgload::is_dev_package("reverseC")){
+      #we're in a dev environment, need to load with load_all
+      snow::clusterCall(cl=this.cluster,function(){suppressMessages(library(devtools));suppressMessages(load_all())})
+    } else {
+      #we're being used from an installed copy of reverseC load package explicitly
+      snow::clusterCall(cl=this.cluster,function(){suppressMessages(library(reverseC))})
+    }
     
-    result <- parLapply(cl=this.cluster, list_of_job_args, simulate_and_mediate)
+    snow::clusterExport(cl=this.cluster,c("nSimImai"),envir=environment())
+    
+    result <- snow::parLapply(cl=this.cluster, list_of_job_args, simulate_and_mediate)
+    
     attr(result, "dim") <- dim(list_of_job_args)
+    
     return (result)
   }
-  
 }

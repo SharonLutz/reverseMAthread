@@ -1,11 +1,9 @@
+#' @export
 reverseMRdata <-
 function(nSNP=3,X,M,Y,SEED=1){
   
   # Set the seed
   set.seed(SEED)
-  
-  # Import the MR library
-  library(MendelianRandomization)
   
   # Error checks
   if(nSNP<3 | nSNP==0 | floor(nSNP)!=ceiling(nSNP) ){stop("Error: nSNP must be an integer greater than or equal to 3")}
@@ -37,24 +35,24 @@ function(nSNP=3,X,M,Y,SEED=1){
   }
   
   # Create MR.input object
-  mr.input <- mr_input(bx = betaXM, bxse = betaXMse, by = betaXY, byse = betaXYse)
-  mr.input2 <- mr_input(bx = betaXY, bxse = betaXYse, by = betaXM, byse = betaXMse)
+  mr.input <- MendelianRandomization::mr_input(bx = betaXM, bxse = betaXMse, by = betaXY, byse = betaXYse)
+  mr.input2 <- MendelianRandomization::mr_input(bx = betaXY, bxse = betaXYse, by = betaXM, byse = betaXMse)
   
   # Get the estimates and p-values from the methods
-  mat_results["EMR.EggerNR",1] <- mr_egger(mr.input,robust = F,penalized = F)$Estimate
-  mat_results["PMR.EggerNR",1] <- mr_egger(mr.input,robust = F,penalized = F)$Pvalue.Est
-  mat_results["EMR.IVWNR",1] <- mr_ivw(mr.input,robust = F,penalized = F)$Estimate
-  mat_results["PMR.IVWNR",1] <- mr_ivw(mr.input,robust = F,penalized = F)$Pvalue
-  mat_results["EMR.MedianNR",1] <- mr_median(mr.input,seed = NA)$Estimate
-  mat_results["PMR.MedianNR",1] <- mr_median(mr.input,seed = NA)$Pvalue
+  mat_results["EMR.EggerNR",1] <- MendelianRandomization::mr_egger(mr.input,robust = F,penalized = F)$Estimate
+  mat_results["PMR.EggerNR",1] <- MendelianRandomization::mr_egger(mr.input,robust = F,penalized = F)$Pvalue.Est
+  mat_results["EMR.IVWNR",1] <- MendelianRandomization::mr_ivw(mr.input,robust = F,penalized = F)$Estimate
+  mat_results["PMR.IVWNR",1] <- MendelianRandomization::mr_ivw(mr.input,robust = F,penalized = F)$Pvalue
+  mat_results["EMR.MedianNR",1] <- MendelianRandomization::mr_median(mr.input,seed = NA)$Estimate
+  mat_results["PMR.MedianNR",1] <- MendelianRandomization::mr_median(mr.input,seed = NA)$Pvalue
   
   # Get the estimates and p-values from the methods reversed
-  mat_results["EMR.EggerR",1] <- mr_egger(mr.input2,robust = F,penalized = F)$Estimate
-  mat_results["PMR.EggerR",1] <- mr_egger(mr.input2,robust = F,penalized = F)$Pvalue.Est
-  mat_results["EMR.IVWR",1] <- mr_ivw(mr.input2,robust = F,penalized = F)$Estimate
-  mat_results["PMR.IVWR",1] <- mr_ivw(mr.input2,robust = F,penalized = F)$Pvalue
-  mat_results["EMR.MedianR",1] <- mr_median(mr.input2,seed = NA)$Estimate
-  mat_results["PMR.MedianR",1] <- mr_median(mr.input2,seed = NA)$Pvalue
+  mat_results["EMR.EggerR",1] <- MendelianRandomization::mr_egger(mr.input2,robust = F,penalized = F)$Estimate
+  mat_results["PMR.EggerR",1] <- MendelianRandomization::mr_egger(mr.input2,robust = F,penalized = F)$Pvalue.Est
+  mat_results["EMR.IVWR",1] <- MendelianRandomization::mr_ivw(mr.input2,robust = F,penalized = F)$Estimate
+  mat_results["PMR.IVWR",1] <- MendelianRandomization::mr_ivw(mr.input2,robust = F,penalized = F)$Pvalue
+  mat_results["EMR.MedianR",1] <- MendelianRandomization::mr_median(mr.input2,seed = NA)$Estimate
+  mat_results["PMR.MedianR",1] <- MendelianRandomization::mr_median(mr.input2,seed = NA)$Pvalue
   
   # Print out the matrix but use list
   list(mat_results)

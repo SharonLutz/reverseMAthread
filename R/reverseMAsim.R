@@ -1,7 +1,7 @@
+#' @export
 reverseMAsim <-
 function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,0.2),varY=1,
                          nSim=100,nSimImai=1000,SEED=1,plot.pdf=T,plot.name="reverseMAsim.pdf",alpha_level=0.05){
-  library(mediation)
   
   # Set the seed.
   set.seed(SEED)
@@ -44,7 +44,7 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
       # Fit the mediation model
       med.fit <- (lm(M~X))
       out.fit <- (lm(Y~X+M))
-      med.out <- mediate(med.fit,out.fit,treat = "X",mediator = "M",sims = nSimImai)
+      med.out <- mediation::mediate(med.fit,out.fit,treat = "X",mediator = "M",sims = nSimImai)
       
       # Get the direct and indirect effects
       pval_direct <- summary(med.out)$z.avg.p
@@ -61,7 +61,7 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
       # Fit the mediation model
       med.fitR <- (lm(M2~X))
       out.fitR <- (lm(Y2~X+M2))
-      med.outR <- mediate(med.fitR,out.fitR,treat = "X",mediator = "M2",sims = nSimImai)
+      med.outR <- mediation::mediate(med.fitR,out.fitR,treat = "X",mediator = "M2",sims = nSimImai)
       
       # Get the direct and indirect effects
       pval_direct_r <- summary(med.outR)$z.avg.p

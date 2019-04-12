@@ -1,6 +1,5 @@
-suppressMessages(library(methods))
 
-setClass("MediateDataGenerationParameters", 
+methods::setClass("MediateDataGenerationParameters", 
          slots = representation(
            n = "numeric",
            pX = "numeric",
@@ -56,7 +55,7 @@ setClass("MediateDataGenerationParameters",
            return(TRUE)
          })->MediateDataGenerationParameters
 
-setClass("MediateModelVariables",
+methods::setClass("MediateModelVariables",
          slots = representation(
            X = "numeric",
            M = "numeric",
@@ -71,7 +70,7 @@ setClass("MediateModelVariables",
          )
 ) -> MediateModelVariables
 
-setClass("MediateLinearModels",
+methods::setClass("MediateLinearModels",
          slots = representation(
            med.fit="lm",
            out.fit="lm",
@@ -86,7 +85,7 @@ setClass("MediateLinearModels",
          )
 ) -> MediateLinearModels
 
-setClass("MediationProbValues",
+methods::setClass("MediationProbValues",
          slots=representation(
            pval_direct="numeric",
            pval_indirect="numeric",
@@ -106,12 +105,12 @@ setClass("MediationProbValues",
            if(object@pval_indirect_r<0 || object@pval_indirect_r > 1){return("Error: pval_indirect_r must be between 0.0 and 1.0")}
          })->MediationProbValues
 
-setGeneric(name = "generateData",
+methods::setGeneric(name = "generateData",
            def = function(theObject, bM.ind=1, SEED=1){
              standardGeneric("generateData")
            })
 
-setMethod(f="generateData",
+methods::setMethod(f="generateData",
           signature = "MediateDataGenerationParameters",
           definition = function(theObject, bM.ind=1, SEED=1){
             
@@ -124,12 +123,12 @@ setMethod(f="generateData",
             return(MediateModelVariables(X=X, M=M, Y=Y, SEED=SEED))
           })
 
-setGeneric(name = "generateDataMatrix",
+methods::setGeneric(name = "generateDataMatrix",
            def = function(theObject, initial_SEED=1){
              standardGeneric("generateDataMatrix")
            })
 
-setMethod(f="generateDataMatrix",
+methods::setMethod(f="generateDataMatrix",
           signature = "MediateDataGenerationParameters",
           definition = function(theObject, initial_SEED=1){
             result = matrix(list(), nrow=length(theObject@betaM), ncol=theObject@nSim)
@@ -144,12 +143,12 @@ setMethod(f="generateDataMatrix",
             return(result)
           })
 
-setGeneric(name = "assembleLinearModels",
+methods::setGeneric(name = "assembleLinearModels",
            def = function(theObject){
              standardGeneric("assembleLinearModels")
            })
 
-setMethod(f="assembleLinearModels",
+methods::setMethod(f="assembleLinearModels",
           signature = "MediateModelVariables",
           definition = function(theObject){
             df = data.frame(X=theObject@X, Y1=theObject@Y, M1=theObject@M, M2=theObject@Y, Y2=theObject@M)
