@@ -98,11 +98,10 @@ setClass("MediateVariables",
            
            
            return(TRUE)
-         }
-         )->MediateVariables
+         })->MediateVariables
 
 setGeneric(name = "generateData",
-           def = function(theObject, bM.ind){
+           def = function(theObject, bM.ind=1){
              standardGeneric("generateData")
            })
 setMethod(f="generateData",

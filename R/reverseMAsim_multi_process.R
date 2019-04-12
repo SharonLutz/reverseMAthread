@@ -3,6 +3,9 @@ source("R/multi_process_mediate.R")
 reverseMAsimMultiProcess <-
 function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,0.2),varY=1,
                          nSim=100,nSimImai=1000,SEED=1,plot.pdf=T,plot.name="reverseMAsim.pdf",alpha_level=0.05, num_cores=getOption("mediate.cores", detectCores() - 1)){
+  # Set the seed.
+  set.seed(SEED)
+  
   if(detectCores() == 1){
     warning("your machine may not be suitable for multiprocessing, only 1 core was detected")
   }
@@ -17,9 +20,6 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
   if(length(nSimImai) != 1){stop ("Error: nSimImai must be a single integer value")}
   if(nSimImai<0 | nSimImai==0 | floor(nSimImai)!=ceiling(nSimImai) ){stop("Error: n must be an integer greater than or equal to 1")}
   
-  # Set the seed.
-  set.seed(SEED)
-  
   #other values will be checked by the validator of the class
   med_vars = MediateVariables(
     n = n,
@@ -29,9 +29,9 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
     varM = varM,
     beta0 = beta0,
     betaX = betaX,
-    betaM=betaM,
-    varY=varY,
-    nSim=nSim
+    betaM = betaM,
+    varY = varY,
+    nSim = nSim
   )
   
   mat_total <- matrix(0,nrow=length(betaM),ncol=4)
