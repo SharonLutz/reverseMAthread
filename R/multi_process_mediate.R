@@ -1,6 +1,12 @@
 #' @include mediate_s4_classes.R
 #' @importFrom mediation mediate
 
+
+
+#' @title Simulate Data and Mediate Linear Models
+#' @description runs forward and reverse mediation on argument contents
+#' @param med_model_vars an instance of \code{MediateModelVariables}
+#' @return a \code{MediationProbValues} instance with values obtained by running mediate on forward and reverse linear models.
 simulate_and_mediate <- function(med_model_vars){
   #my test begins here
   
@@ -23,6 +29,12 @@ simulate_and_mediate <- function(med_model_vars){
     )
 }
 
+#' @title Perform Mediation Using Parallel Processing
+#' @description starts up multiple processes, configures their environment, and runs simulation and mediation analysis for each item in the input
+#' @name mediate_parallel
+#' @param list_of_job_args A list of \code{MediateModelVariables} objects
+#' @param nSimImai number of mediation sims to perform
+#' @return list of \code{MediationProbValues} objects
 if (.Platform$OS.type == "unix") {
   mediate_parallel <- function(list_of_job_args, nSimImai=1000){
     g_env = globalenv()

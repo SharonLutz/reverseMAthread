@@ -1,6 +1,24 @@
 #' @importFrom MendelianRandomization mr_input mr_egger mr_ivw mr_median
  
 #' @export
+#' @title reverseMRsim
+#' @description A function to simulate the performance of different MR methods from the MendelianRandomization package in scenarios of reverse causality.
+#' @author Annie Thwing, Sharon Lutz
+#' @param n is the sample size
+#' @param nSNP is the number of SNPS to generate
+#' @param MAF is a vector of the MAF of each SNP
+#' @param gamma0 is the intercept for M
+#' @param gammaX is a vector of the associations of each SNP with M
+#' @param varM is the variance of M
+#' @param beta0 is the intercept for Y
+#' @param betaM is a vector of different associations of M with Y
+#' @param varY is the variance of Y
+#' @param nSim is the number of simulations to run
+#' @param plot.pdf is T to output a plot, is F to not output a plot
+#' @param plot.name is the name of the plot
+#' @param alpha_level is the significance level
+#' @param SEED is the seed
+#' @return a matrix of the power of three Mendelian Randomization approaches from the MendelianRandomization package to detect an effect of the mediator M on the outcome Y when M and Y are correctly specified and also when they are incorrectly specified (the true mediator is Y and the true outcome is M)
 reverseMRsim <-
 function(n=1000,nSNP=3,MAF=c(0.2,0.2,0.2),gamma0=0,gammaX=c(0.2,0.2,0.2),varM=1,beta0=0,betaM=c(0,0.1),
                          varY=1,nSim=100,plot.pdf=T,plot.name="reverseMRsim.pdf",alpha_level=0.05,SEED=1){

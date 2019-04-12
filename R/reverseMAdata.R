@@ -1,6 +1,15 @@
 #' @importFrom mediation mediate
 
 #' @export
+#' @title reverseMAdata
+#' @description Apply mediate function from the mediation package in scenarios of reverse causality.
+#' @param X is the exposure
+#' @param M is the mediator
+#' @param Y is the outcome
+#' @param SEED is the seed
+#' @param nSimImai is the number of simulations for the mediate method
+#' @author Annie Thwing, Sharon Lutz
+#' @return a list of Estimates and p-values for the direct and indirect effects in situations with and without reverse causality.
 reverseMAdata <-
 function(X, M, Y, SEED=1,nSimImai=1000){
   

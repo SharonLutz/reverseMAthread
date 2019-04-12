@@ -25,7 +25,6 @@ RoxygenNote: 6.1.1
 Collate: 
     'mediate_s4_classes.R'
     'multi_process_mediate.R'
-    'parallel_devtesting.R'
     'reverseC-internal.R'
     'reverseMAdata.R'
     'reverseMAsim.R'

@@ -1,4 +1,17 @@
 
+#' @title MediateDataGenerationParameters
+#' @description Convenience class for use with other methods and classes to generate mediation data for use with parallel processing.
+#' @author Michael Gooch
+#' @slot n is the sample size.
+#' @slot pX is the minor allele frequency
+#' @slot gamma0 is the intercept for M
+#' @slot gammaX is the association of X with M
+#' @slot varM is the variance of M
+#' @slot beta0 is the intercept for Y
+#' @slot betaX is the direct effect of X on Y
+#' @slot betaM is a vector of different associations of M with Y
+#' @slot varY is the variance of Y
+#' @slot nSim is the number of simulations to run
 methods::setClass("MediateDataGenerationParameters", 
          slots = representation(
            n = "numeric",
@@ -55,6 +68,13 @@ methods::setClass("MediateDataGenerationParameters",
            return(TRUE)
          })->MediateDataGenerationParameters
 
+#' @title MediateModelVariables
+#' @description convenience container for vectors of simulated data to be used with other methods and classes to generate linear models for use with mediation analysis in parallel processes
+#' @author Michael Gooch
+#' @slot X is the exposure
+#' @slot M is the mediator
+#' @slot Y is the outcome
+#' @slot SEED is the seed to use when performing mediation on the models generated from this data
 methods::setClass("MediateModelVariables",
          slots = representation(
            X = "numeric",
@@ -70,6 +90,13 @@ methods::setClass("MediateModelVariables",
          )
 ) -> MediateModelVariables
 
+#' @title MediateLinearModels
+#' @description convenience container for 4 linear models, 2 pairs, intended for forward and reverse mediation analysis
+#' @author Michael Gooch
+#' @slot med.fit linear model for the mediator
+#' @slot out.fit linear model for the outcome
+#' @slot med.fit.r linear model for the mediator with M and Y swapped
+#' @slot out.fit.r linear model for the outcome with M and Y swapped
 methods::setClass("MediateLinearModels",
          slots = representation(
            med.fit="lm",
@@ -85,6 +112,13 @@ methods::setClass("MediateLinearModels",
          )
 ) -> MediateLinearModels
 
+#' @title MediationProbValues
+#' @description Convenience container for the result of a forward and reverse pair of mediation analysis results
+#' @author Michael Gooch
+#' @slot pval_direct direct probability from forward mediation analysis
+#' @slot pval_indirect indirect probability from forward mediation analysis
+#' @slot pval_direct_r direct probability from reverse mediation analysis
+#' @slot pval_indirect_r indirect probability from reverse mediation analysis
 methods::setClass("MediationProbValues",
          slots=representation(
            pval_direct="numeric",
@@ -105,6 +139,14 @@ methods::setClass("MediationProbValues",
            if(object@pval_indirect_r<0 || object@pval_indirect_r > 1){return("Error: pval_indirect_r must be between 0.0 and 1.0")}
          })->MediationProbValues
 
+#' @name generateData
+#' @title generateData
+#' @author Michael Gooch
+#' @description use data generation parameters with the random number generator to generate simulated data
+#' @param theObject the object to be used in generation of the data, should be an instance of \code{MediateDataGenerationParameters}
+#' @param bM.ind index for the betaM vector stored in theObject
+#' @param SEED SEED to use with the resulting data
+#' @return an instance of \code{MediateModelVariables} with random values determined by current rng state, MediateDataGenerationParameters, and bM.ind,
 methods::setGeneric(name = "generateData",
            def = function(theObject, bM.ind=1, SEED=1){
              standardGeneric("generateData")
@@ -123,6 +165,13 @@ methods::setMethod(f="generateData",
             return(MediateModelVariables(X=X, M=M, Y=Y, SEED=SEED))
           })
 
+#' @name generateDataMatrix
+#' @title generateDataMatrix
+#' @author Michael Gooch
+#' @description generate all the data vectors and rng seeds needed to do mediation with parallel processing 
+#' @param theObject an instance of MediateDataGenerationParameters
+#' @param initial_SEED the SEED that will be used with set.seed before generating the data, the generated MediateModelVariables will be provided incremented SEED values starting with initial_SEED + 1
+#' @return matrix with dimensions of \code{rows = length(theObject@@betaM)} and \code{columns = theObject@@nSim} containing the generated data
 methods::setGeneric(name = "generateDataMatrix",
            def = function(theObject, initial_SEED=1){
              standardGeneric("generateDataMatrix")
@@ -132,6 +181,7 @@ methods::setMethod(f="generateDataMatrix",
           signature = "MediateDataGenerationParameters",
           definition = function(theObject, initial_SEED=1){
             result = matrix(list(), nrow=length(theObject@betaM), ncol=theObject@nSim)
+            set.seed(initial_SEED)
             next_seed = initial_SEED + 1
             for(i in 1:theObject@nSim){
               for(bM.ind in 1:length(theObject@betaM)){
@@ -143,6 +193,12 @@ methods::setMethod(f="generateDataMatrix",
             return(result)
           })
 
+#' @name assembleLinearModels
+#' @title assembleLinearModels
+#' @author Michael Gooch
+#' @description create forward and reverse(Y and M are swapped) linear models for use with mediation analysis
+#' @param theObject an instance of MediateModelVariables
+#' @return an instance of MediateLinearModels with forward and reverse linear models created using the variable vectors in theObject
 methods::setGeneric(name = "assembleLinearModels",
            def = function(theObject){
              standardGeneric("assembleLinearModels")

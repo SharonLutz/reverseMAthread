@@ -1,6 +1,15 @@
 #' @importFrom MendelianRandomization mr_input mr_egger mr_ivw mr_median
 
 #' @export
+#' @title reverseMRdata
+#' @author Annie Thwing, Sharon Lutz
+#' @description Apply MR methods from the MendelianRandomization package in scenarios of reverse causality.
+#' @param nSNP the number of SNPS
+#' @param X is a vector of SNP data, where each SNP is a column and the number of rows is the number of subjects
+#' @param M is the mediator
+#' @param Y is the outcome
+#' @param SEED is the seed
+#' @return a list of Estimates and p-values for the direct and indirect effects in situations with and without reverse causality.
 reverseMRdata <-
 function(nSNP=3,X,M,Y,SEED=1){
   
