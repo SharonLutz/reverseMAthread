@@ -18,7 +18,7 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
   
   if(alpha_level>1 | alpha_level<0){stop("Error: alpha_level must be between 0 and 1")}
   if(length(nSimImai) != 1){stop ("Error: nSimImai must be a single integer value")}
-  if(nSimImai<0 | nSimImai==0 | floor(nSimImai)!=ceiling(nSimImai) ){stop("Error: n must be an integer greater than or equal to 1")}
+  if(nSimImai<=0 || floor(nSimImai)!=ceiling(nSimImai) ){stop("Error: n must be an integer greater than or equal to 1")}
   
   #other values will be checked by the validator of the class
   med_vars = MediateDataGenerationParameters(

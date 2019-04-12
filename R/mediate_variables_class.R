@@ -44,14 +44,14 @@ setClass("MediateDataGenerationParameters",
            if(length(unique(object@betaM))<2){return("Error: betaM must be a vector with at least two values")}
            
            #INT style values
-           if(object@n<0 | object@n==0 | floor(object@n)!=ceiling(object@n) ){return("Error: n must be an integer greater than or equal to 1")}
-           if(object@nSim<0 | object@nSim==0 | floor(object@nSim)!=ceiling(object@nSim) ){return("Error: n must be an integer greater than or equal to 1")}
+           if(object@n<=0 || floor(object@n)!=ceiling(object@n) ){return("Error: n must be an integer greater than or equal to 1")}
+           if(object@nSim<=0 || floor(object@nSim)!=ceiling(object@nSim) ){return("Error: n must be an integer greater than or equal to 1")}
            
            #valid input checks
            
            if(object@pX<0 | object@pX>1){return("Error: pX must be greater than 0 and less than 1")}
-           if(!object@varM>0){return("Error: varM must be greater than 0")}
-           if(!object@varY>0){return("Error: varY must be greater than 0")}
+           if(object@varM<=0){return("Error: varM must be greater than 0")}
+           if(object@varY<=0){return("Error: varY must be greater than 0")}
            
            return(TRUE)
          })->MediateDataGenerationParameters
