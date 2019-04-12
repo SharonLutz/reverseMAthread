@@ -50,7 +50,7 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
       # Fit the mediation model
       med.fitR <- (lm(M2~X))
       out.fitR <- (lm(Y2~X+M2))
-      med.outR <- mediate(med.fitR,out.fitR,treat = "X",mediator = "M2",sims = nSim)
+      med.outR <- mediate(med.fitR,out.fitR,treat = "X",mediator = "M2",sims = nSimImai)
       
       # Get the direct and indirect effects
       pval_direct_r <- summary(med.outR)$z.avg.p
