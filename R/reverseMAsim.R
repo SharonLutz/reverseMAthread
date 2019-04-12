@@ -1,3 +1,6 @@
+#' @importFrom mediation mediate
+#' @importFrom tictoc tic toc
+
 #' @export
 reverseMAsim <-
 function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,0.2),varY=1,
@@ -20,7 +23,7 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
   
   mat_total <- matrix(0,nrow=length(betaM),ncol=4)
   colnames(mat_total) <- c("DirectNR","IndirectNR","DirectR","IndirectR")
-  
+  tic("running mediation on models")
   for(i in 1:nSim){
     if(floor(i/10)==ceiling(i/10)){print(paste(i,"of",nSim,"simulations"))}
       
@@ -44,7 +47,7 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
       # Fit the mediation model
       med.fit <- (lm(M~X))
       out.fit <- (lm(Y~X+M))
-      med.out <- mediation::mediate(med.fit,out.fit,treat = "X",mediator = "M",sims = nSimImai)
+      med.out <- mediate(med.fit,out.fit,treat = "X",mediator = "M",sims = nSimImai)
       
       # Get the direct and indirect effects
       pval_direct <- summary(med.out)$z.avg.p
@@ -61,7 +64,7 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
       # Fit the mediation model
       med.fitR <- (lm(M2~X))
       out.fitR <- (lm(Y2~X+M2))
-      med.outR <- mediation::mediate(med.fitR,out.fitR,treat = "X",mediator = "M2",sims = nSimImai)
+      med.outR <- mediate(med.fitR,out.fitR,treat = "X",mediator = "M2",sims = nSimImai)
       
       # Get the direct and indirect effects
       pval_direct_r <- summary(med.outR)$z.avg.p
@@ -76,7 +79,7 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
     mat_total <- mat_total+mat_results
     
   } # End of nSim
-  
+  toc()
   mat_total <- mat_total/nSim
   
   if(plot.pdf){

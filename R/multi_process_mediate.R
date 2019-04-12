@@ -1,4 +1,5 @@
 #' @include mediate_s4_classes.R
+#' @importFrom mediation mediate
 
 simulate_and_mediate <- function(med_model_vars){
   #my test begins here
@@ -8,8 +9,8 @@ simulate_and_mediate <- function(med_model_vars){
   # Fit the mediation model
   set.seed(med_model_vars@SEED)
   
-  med.out <- mediation::mediate(models@med.fit, models@out.fit, treat = "X",mediator = "M1",sims = nSimImai)
-  med.out.r <- mediation::mediate(models@med.fit.r, models@out.fit.r, treat = "X",mediator = "M2",sims = nSimImai)
+  med.out <- mediate(models@med.fit, models@out.fit, treat = "X",mediator = "M1",sims = nSimImai)
+  med.out.r <- mediate(models@med.fit.r, models@out.fit.r, treat = "X",mediator = "M2",sims = nSimImai)
   
   summary_obj = summary(med.out)
   summary_obj.r = summary(med.out.r)

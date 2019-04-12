@@ -1,3 +1,5 @@
+#' @importFrom MendelianRandomization mr_input mr_egger mr_ivw mr_median
+ 
 #' @export
 reverseMRsim <-
 function(n=1000,nSNP=3,MAF=c(0.2,0.2,0.2),gamma0=0,gammaX=c(0.2,0.2,0.2),varM=1,beta0=0,betaM=c(0,0.1),
@@ -59,28 +61,28 @@ function(n=1000,nSNP=3,MAF=c(0.2,0.2,0.2),gamma0=0,gammaX=c(0.2,0.2,0.2),varM=1,
       }
       
       # Create MR.input object
-      mr.input <- MendelianRandomization::mr_input(bx = betaXM, bxse = betaXMse, by = betaXY, byse = betaXYse)
-      mr.input2 <- MendelianRandomization::mr_input(bx = betaXY, bxse = betaXYse, by = betaXM, byse = betaXMse)
+      mr.input <- mr_input(bx = betaXM, bxse = betaXMse, by = betaXY, byse = betaXYse)
+      mr.input2 <- mr_input(bx = betaXY, bxse = betaXYse, by = betaXM, byse = betaXMse)
       
       # Get the estimates and p-values from the methods
-      if(MendelianRandomization::mr_egger(mr.input,robust = F,penalized = F)$Pvalue.Est < alpha_level){
+      if(mr_egger(mr.input,robust = F,penalized = F)$Pvalue.Est < alpha_level){
         mat_results["PMR.EggerNR",bM.ind] <- mat_results["PMR.EggerNR",bM.ind] +1
       }
-      if(MendelianRandomization::mr_ivw(mr.input,robust = F,penalized = F)$Pvalue < alpha_level){
+      if(mr_ivw(mr.input,robust = F,penalized = F)$Pvalue < alpha_level){
         mat_results["PMR.IVWNR",bM.ind] <- mat_results["PMR.IVWNR",bM.ind] +1
       }
-      if(MendelianRandomization::mr_median(mr.input,seed = NA)$Pvalue < alpha_level){
+      if(mr_median(mr.input,seed = NA)$Pvalue < alpha_level){
         mat_results["PMR.MedianNR",bM.ind] <- mat_results["PMR.MedianNR",bM.ind] +1
       }
       
       # Get the estimates and p-values from the methods reversed
-      if(MendelianRandomization::mr_egger(mr.input2,robust = F,penalized = F)$Pvalue.Est < alpha_level){
+      if(mr_egger(mr.input2,robust = F,penalized = F)$Pvalue.Est < alpha_level){
         mat_results["PMR.EggerR",bM.ind] <- mat_results["PMR.EggerR",bM.ind] +1
       }
-      if(MendelianRandomization::mr_ivw(mr.input2,robust = F,penalized = F)$Pvalue < alpha_level){
+      if(mr_ivw(mr.input2,robust = F,penalized = F)$Pvalue < alpha_level){
         mat_results["PMR.IVWR",bM.ind] <- mat_results["PMR.IVWR",bM.ind] +1
       }
-      if(MendelianRandomization::mr_median(mr.input2,seed = NA)$Pvalue < alpha_level){
+      if(mr_median(mr.input2,seed = NA)$Pvalue < alpha_level){
         mat_results["PMR.MedianR",bM.ind] <- mat_results["PMR.MedianR",bM.ind] +1
       }
       

@@ -1,3 +1,5 @@
+#' @importFrom mediation mediate
+
 #' @export
 reverseMAdata <-
 function(X, M, Y, SEED=1,nSimImai=1000){
@@ -18,7 +20,7 @@ function(X, M, Y, SEED=1,nSimImai=1000){
   # Fit the mediation model
   med.fit <- (lm(M~X))
   out.fit <- (lm(Y~X+M))
-  med.out <- mediation::mediate(med.fit,out.fit,treat = "X",mediator = "M",sims = nSimImai)
+  med.out <- mediate(med.fit,out.fit,treat = "X",mediator = "M",sims = nSimImai)
   
   # Get the direct and indirect effects
   mat_results["EDirectNR",1] <- summary(med.out)$z.avg
@@ -33,7 +35,7 @@ function(X, M, Y, SEED=1,nSimImai=1000){
   # Fit the mediation model
   med.fitR <- (lm(M2~X))
   out.fitR <- (lm(Y2~X+M2))
-  med.outR <- mediation::mediate(med.fitR,out.fitR,treat = "X",mediator = "M2",sims = nSimImai)
+  med.outR <- mediate(med.fitR,out.fitR,treat = "X",mediator = "M2",sims = nSimImai)
   
   # Get the direct and indirect effects
   mat_results["EDirectR",1] <- summary(med.outR)$z.avg

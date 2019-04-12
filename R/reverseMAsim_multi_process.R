@@ -1,4 +1,5 @@
 #' @include mediate_s4_classes.R multi_process_mediate.R
+#' @importFrom tictoc tic toc
 
 #' @export
 reverseMAsimMultiProcess <-
@@ -41,9 +42,9 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
   #generate the data needed to make linear models.
   data_matrix = generateDataMatrix(med_vars, SEED)
   print("running mediation on models")
-  tictoc::tic("mediation")
+  tic("mediation")
   result.matrix = mediate_parallel(data_matrix, nSimImai)
-  tictoc::toc()
+  toc()
   rm(data_matrix)
   
   print("processing results")
