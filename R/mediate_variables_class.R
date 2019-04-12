@@ -1,48 +1,6 @@
 suppressMessages(library(methods))
 
-setClass("MediationProbValues",
-         slots=representation(
-           pval_direct="numeric",
-           pval_indirect="numeric"
-         ),
-         prototype = prototype(
-           pval_direct=0,
-           pval_indirect=0
-         ),
-         validity = function(object){
-           if(object@pval_direct<0 || object@pval_direct > 1){return("Error: pval_direct must be between 0.0 and 1.0")}
-           if(object@pval_indirect<0 || object@pval_indirect > 1){return("Error: pval_indirect must be between 0.0 and 1.0")}
-         })->MediationProbValues
-
-setClass("MediateLinearModels",
-            slots = representation(
-              med.fit="lm",
-              out.fit="lm"
-            ),
-            prototype=prototype(
-              med.fit=NULL,
-              out.fit=NULL
-            )
-            ) -> MediateLinearModels
-
-setClass("MediateSimData",
-         slots = representation(
-           X = "numeric",
-           M = "numeric",
-           Y = "numeric",
-           med.fit = "lm",
-           out.fit = "lm"
-         ),
-         prototype = prototype(
-           X = 0,
-           M = 0,
-           Y = 0,
-           med.fit=NULL,
-           out.fit=NULL
-         )
-         ) -> MediateSimData
-
-setClass("MediateVariables", 
+setClass("MediateDataGenerationParameters", 
          slots = representation(
            n = "numeric",
            pX = "numeric",
@@ -54,7 +12,7 @@ setClass("MediateVariables",
            betaM = "numeric",
            varY = "numeric",
            nSim = "numeric"
-           ),
+         ),
          prototype = prototype(
            n = 6000,
            pX = 0.2,
@@ -95,76 +53,96 @@ setClass("MediateVariables",
            if(!object@varM>0){return("Error: varM must be greater than 0")}
            if(!object@varY>0){return("Error: varY must be greater than 0")}
            
-           
-           
            return(TRUE)
-         })->MediateVariables
+         })->MediateDataGenerationParameters
+
+setClass("MediateModelVariables",
+         slots = representation(
+           X = "numeric",
+           M = "numeric",
+           Y = "numeric",
+           SEED = "numeric"
+         ),
+         prototype = prototype(
+           X = 0,
+           M = 0,
+           Y = 0,
+           SEED = 1
+         )
+) -> MediateModelVariables
+
+setClass("MediateLinearModels",
+         slots = representation(
+           med.fit="lm",
+           out.fit="lm",
+           med.fit.r="lm",
+           out.fit.r="lm"
+         ),
+         prototype=prototype(
+           med.fit=NULL,
+           out.fit=NULL,
+           med.fit.r=NULL,
+           out.fit.r=NULL
+         )
+) -> MediateLinearModels
+
+setClass("MediationProbValues",
+         slots=representation(
+           pval_direct="numeric",
+           pval_indirect="numeric",
+           pval_direct_r="numeric",
+           pval_indirect_r="numeric"
+         ),
+         prototype = prototype(
+           pval_direct=0,
+           pval_indirect=0,
+           pval_direct_r=0,
+           pval_indirect_r=0
+         ),
+         validity = function(object){
+           if(object@pval_direct<0 || object@pval_direct > 1){return("Error: pval_direct must be between 0.0 and 1.0")}
+           if(object@pval_indirect<0 || object@pval_indirect > 1){return("Error: pval_indirect must be between 0.0 and 1.0")}
+           if(object@pval_direct_r<0 || object@pval_direct_r > 1){return("Error: pval_direct_r must be between 0.0 and 1.0")}
+           if(object@pval_indirect_r<0 || object@pval_indirect_r > 1){return("Error: pval_indirect_r must be between 0.0 and 1.0")}
+         })->MediationProbValues
 
 setGeneric(name = "generateData",
-           def = function(theObject, bM.ind=1){
+           def = function(theObject, bM.ind=1, SEED=1){
              standardGeneric("generateData")
            })
+
 setMethod(f="generateData",
-          signature = "MediateVariables",
-          definition = function(theObject, bM.ind=1){
-            data = MediateSimData()
+          signature = "MediateDataGenerationParameters",
+          definition = function(theObject, bM.ind=1, SEED=1){
             
-            data@X = rbinom(theObject@n,2,theObject@pX)
+            X = rbinom(theObject@n,2,theObject@pX)
             
-            data@M = rnorm(theObject@n,theObject@gamma0 + theObject@gammaX * data@X, sqrt(theObject@varM))
+            M = rnorm(theObject@n,theObject@gamma0 + theObject@gammaX * X, sqrt(theObject@varM))
             
-            data@Y = rnorm(theObject@n, theObject@beta0 + theObject@betaX * data@X + theObject@betaM[[bM.ind]] * data@M, sqrt(theObject@varY))
+            Y = rnorm(theObject@n, theObject@beta0 + theObject@betaX * X + theObject@betaM[[bM.ind]] * M, sqrt(theObject@varY))
             
-            return(data)
-          })
-
-setGeneric(name = "reverseData",
-           def = function(theObject){
-             standardGeneric("reverseData")
-           })
-
-setMethod(f="reverseData",
-          signature = "MediateSimData",
-          definition = function(theObject){
-            tmpvar = theObject@M
-            theObject@M = theObject@Y
-            theObject@Y = tmpvar
-            return(theObject)
+            return(MediateModelVariables(X=X, M=M, Y=Y, SEED=SEED))
           })
 
 setGeneric(name = "generateDataMatrix",
-           def = function(theObject){
+           def = function(theObject, initial_SEED=1){
              standardGeneric("generateDataMatrix")
            })
 
 setMethod(f="generateDataMatrix",
-          signature = "MediateVariables",
-          definition = function(theObject){
+          signature = "MediateDataGenerationParameters",
+          definition = function(theObject, initial_SEED=1){
             result = matrix(list(), nrow=length(theObject@betaM), ncol=theObject@nSim)
-            
+            next_seed = initial_SEED + 1
             for(i in 1:theObject@nSim){
               for(bM.ind in 1:length(theObject@betaM)){
-                data_obj = generateData(theObject, bM.ind)
-                result[[bM.ind,i]] = data_obj
+                result[[bM.ind,i]] = generateData(theObject, bM.ind, next_seed)
+                next_seed = next_seed + 1
               }
             }
             
             return(result)
           })
-
-setGeneric(name = "reverseDataMatrix",
-           def = function(theList){
-             standardGeneric("reverseDataMatrix")
-           })
-setMethod(f="reverseDataMatrix",
-          signature = "matrix",
-          definition = function(theList){
-            for(i in 1:length(theList)){
-              theList[[i]] = reverseData(theList[[i]])
-            }
-            return(theList)
-          })
-
 
 setGeneric(name = "assembleLinearModels",
            def = function(theObject){
@@ -172,10 +150,12 @@ setGeneric(name = "assembleLinearModels",
            })
 
 setMethod(f="assembleLinearModels",
-          signature = "MediateSimData",
+          signature = "MediateModelVariables",
           definition = function(theObject){
-            df = data.frame(X=theObject@X, Y=theObject@Y, M=theObject@M)
-            med.fit = lm("M~X", data=df)
-            out.fit = lm("Y~X+M", data=df)
-            return(MediateLinearModels(med.fit=med.fit, out.fit=out.fit))
+            df = data.frame(X=theObject@X, Y1=theObject@Y, M1=theObject@M, M2=theObject@Y, Y2=theObject@M)
+            med.fit = lm("M1~X", data=df)
+            out.fit = lm("Y1~X+M1", data=df)
+            med.fit.r = lm("M2~X", data=df)
+            out.fit.r = lm("Y2~X+M2", data=df)
+            return(MediateLinearModels(med.fit=med.fit, out.fit=out.fit, med.fit.r=med.fit.r, out.fit.r=out.fit.r))
           })

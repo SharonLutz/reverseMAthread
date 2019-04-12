@@ -1,31 +1,48 @@
 source("R/mediate_variables_class.R")
 suppressMessages(library(parallel))
 
-simulate_and_mediate <- function(med_data = NULL){
+simulate_and_mediate <- function(med_model_vars){
   suppressMessages(library(mediation))
   #my test begins here
   
-  if(is.null(med_data)){
-    med_vars = MediateVariables()
-    med_data = generateData(med_vars,1)
-  }
-  
-  models <- assembleLinearModels(med_data)
+  models <- assembleLinearModels(med_model_vars)
   
   # Fit the mediation model
+  set.seed(med_model_vars@SEED)
   
-  med.out <- mediate(models@med.fit, models@out.fit, treat = "X",mediator = "M",sims = nSimImai)
+  med.out <- mediate(models@med.fit, models@out.fit, treat = "X",mediator = "M1",sims = nSimImai)
+  med.out.r <- mediate(models@med.fit.r, models@out.fit.r, treat = "X",mediator = "M2",sims = nSimImai)
+  
   summary_obj = summary(med.out)
-  return(MediationProbValues(pval_direct=summary_obj$z.avg.p, pval_indirect=summary_obj$d.avg.p))
+  summary_obj.r = summary(med.out.r)
+  
+  return(MediationProbValues(
+    pval_direct = summary_obj$z.avg.p, 
+    pval_indirect = summary_obj$d.avg.p, 
+    pval_direct_r = summary_obj.r$z.avg.p,
+    pval_indirect_r = summary_obj.r$d.avg.p)
+    )
 }
 
 if (.Platform$OS.type == "unix") {
   library(parallel)
   mediate_parallel <- function(list_of_job_args, nSimImai=1000){
+    g_env = globalenv()
+    if(exists("nSimImai", envir = g_env)){
+      old_nSimImai = g_env[["nSimImai"]]
+    } else {
+      old_nSimImai = NULL
+    }
+    g_env[["nSimImai"]]=nSimImai
     options(mc.cores = getOption("mediate.cores", detectCores() - 1))
     # TODO: make sure nSimImai value exists for all processes created by mclapply
     result <- mclapply(list_of_job_args, simulate_and_mediate, mc.silent = TRUE)
     attr(result, "dim") <- dim(list_of_job_args)
+    if(is.null(old_nSimImai)){
+      rm("nSimImai", envir=g_env)
+    } else {
+      g_env[["nSimImai"]] = old_nSimImai
+    }
     return(result)
   }
 }else{
