@@ -2,6 +2,14 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 mediation_helper <- function(env) {
-    invisible(.Call('_reverseC_mediation_helper', PACKAGE = 'reverseC', env))
+    invisible(.Call(`_reverseC_mediation_helper`, env))
+}
+
+do_the_thing <- function() {
+    .Call(`_reverseC_do_the_thing`)
+}
+
+derp <- function(x) {
+    .Call(`_reverseC_derp`, x)
 }
 

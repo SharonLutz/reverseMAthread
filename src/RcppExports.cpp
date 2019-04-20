@@ -15,9 +15,32 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// do_the_thing
+NumericMatrix do_the_thing();
+RcppExport SEXP _reverseC_do_the_thing() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(do_the_thing());
+    return rcpp_result_gen;
+END_RCPP
+}
+// derp
+NumericVector derp(NumericVector x);
+RcppExport SEXP _reverseC_derp(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(derp(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_reverseC_mediation_helper", (DL_FUNC) &_reverseC_mediation_helper, 1},
+    {"_reverseC_do_the_thing", (DL_FUNC) &_reverseC_do_the_thing, 0},
+    {"_reverseC_derp", (DL_FUNC) &_reverseC_derp, 1},
     {NULL, NULL, 0}
 };
 

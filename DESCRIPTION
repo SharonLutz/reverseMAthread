@@ -4,6 +4,7 @@ Title: This package contains methods to run mediation analysis and MR with rever
 Version: 1.1.0
 Date: 2018-05-14
 Encoding: UTF-8
+SystemRequirements: C++11
 Authors@R: c(
     person("Annie", "Thwing", email="annie.thwing@ucdenver.edu", role=c("cre","aut")),
     person("Sharon", "Lutz", role=c("aut")),
@@ -18,17 +19,24 @@ Imports:
     MendelianRandomization,
     methods,
     parallel,
-    tictoc
+    tictoc,
+    Rcpp
 URL: https://github.com/SharonLutz/reverseC
 BugReports: https://github.com/SharonLutz/reverseC/issues
 RoxygenNote: 6.1.1
 Collate: 
+    'RcppExports.R'
     'mediate_s4_classes.R'
     'multi_process_mediate.R'
     'reverseC-internal.R'
+    'reverseC-package.R'
     'reverseC.R'
     'reverseMAdata.R'
     'reverseMAsim.R'
     'reverseMAsim_multi_process.R'
     'reverseMRdata.R'
     'reverseMRsim.R'
+    'stripped_down_mediate.R'
+    'thread_toy.R'
+LinkingTo: 
+    Rcpp
