@@ -5,8 +5,32 @@ mediation_helper <- function(env) {
     invisible(.Call(`_reverseC_mediation_helper`, env))
 }
 
-do_the_thing <- function() {
-    .Call(`_reverseC_do_the_thing`)
+cpp_matrix_transpose <- function(mat) {
+    .Call(`_reverseC_cpp_matrix_transpose`, mat)
+}
+
+cpp_matrix_mult <- function(m1, m2) {
+    .Call(`_reverseC_cpp_matrix_mult`, m1, m2)
+}
+
+cpp_matrix_mult_of_transposed <- function(m1, m2) {
+    .Call(`_reverseC_cpp_matrix_mult_of_transposed`, m1, m2)
+}
+
+inner_loop_before_model_matrix <- function(env) {
+    invisible(.Call(`_reverseC_inner_loop_before_model_matrix`, env))
+}
+
+inner_loop_after_model_matrix <- function(env) {
+    invisible(.Call(`_reverseC_inner_loop_after_model_matrix`, env))
+}
+
+outer_loop_before_inner_loop <- function(env) {
+    invisible(.Call(`_reverseC_outer_loop_before_inner_loop`, env))
+}
+
+outer_loop_after_inner_loop <- function(env) {
+    invisible(.Call(`_reverseC_outer_loop_after_inner_loop`, env))
 }
 
 derp <- function(x) {

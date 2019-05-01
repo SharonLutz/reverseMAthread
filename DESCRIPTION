@@ -37,6 +37,7 @@ Collate:
     'reverseMRdata.R'
     'reverseMRsim.R'
     'stripped_down_mediate.R'
+    'stripped_down_mediate_using_RCPP_NO_THREADS.R'
     'thread_toy.R'
 LinkingTo: 
     Rcpp

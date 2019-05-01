@@ -96,8 +96,8 @@ void inner_loop(
   DataFrame pred_data_c = edv_ptr->y_data;
   //pred.data.t[,treat] <- cat.t
   //pred.data.c[,treat] <- cat.c
-  assign_to_all(pred_data_t(_,edv_ptr->treat_i), cat_t);
-  assign_to_all(pred_data_c(_,edv_ptr->treat_i), cat_t);
+  //assign_to_all(pred_data_t(_,edv_ptr->treat_i), cat_t);
+  //assign_to_all(pred_data_c(_,edv_ptr->treat_i), cat_t);
 }
 
 bool compare_vect(const IntegerVector &v1, const IntegerVector &v2){
