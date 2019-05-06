@@ -1,22 +1,8 @@
-setClass("SimpleMediateResult", 
-         representation = representation(
-           direct_p = "numeric",
-           indirect_p="numeric"
-           ),
-         prototype = prototype(
-           direct_p = 0,
-           indirect_p = 0
-         ),
-         validity = function(object){
-           if(object@direct_p<0 || object@direct_p>1){return ("direct p value must be between 0 and 1, inclusive")}
-           if(object@indirect_p<0 || object@indirect_p>1){return ("indirect p value must be between 0 and 1, inclusive")}
-         }
-         ) -> SimpleMediateResult
-
+#' @include pval_func.R
 #our calls always this style: mediate(model.m, model.y, treat= "X", mediator="M", sims = nSimImai)
 #both models are lm with no special types / conditions
-stripped_down_mediate <- function(model.m, model.y, sims = 1000, treat = "treat.name", mediator = "med.name",
-                                  conf.level = .95, control.value = 0, treat.value = 1, get_context=F){
+stripped_down_mediate_with_rcpp <- function(model.m, model.y, sims = 1000, treat = "treat.name", mediator = "med.name",
+                                  conf.level = .95, control.value = 0, treat.value = 1){
   
   # Model frames for M and Y models
   m.data <- model.frame(model.m)  # Call.M$data
@@ -104,68 +90,12 @@ stripped_down_mediate <- function(model.m, model.y, sims = 1000, treat = "treat.
   ##  Outcome Predictions
   #####################################
   
-  effects.tmp <- array(NA, dim = c(n, sims, 4))
-  
-  # if(get_context){
-  #   return(environment())
-  # }
-  
-  for(e in 1:4){
-    tt <- switch(e, c(1,1,1,0), c(0,0,1,0), c(1,0,1,1), c(1,0,0,0))
-    Pr1 <- matrix(nrow=n, ncol=sims)
-    Pr0 <- matrix(nrow=n, ncol=sims)
-    
-    for(j in 1:sims){
-      pred.data.t <- pred.data.c <- y.data
-      
-      # Set treatment values
-      cat.t <- ifelse(tt[1], cat.1, cat.0)
-      cat.c <- ifelse(tt[2], cat.1, cat.0)
-      cat.t.ctrl <- ifelse(tt[1], cat.0, cat.1)
-      cat.c.ctrl <- ifelse(tt[2], cat.0, cat.1)
-      
-      pred.data.t[,treat] <- cat.t
-      pred.data.c[,treat] <- cat.c
-      
-      # Set mediator values
-      PredictMt <- PredictM1[j,] * tt[3] + PredictM0[j,] * (1 - tt[3])
-      PredictMc <- PredictM1[j,] * tt[4] + PredictM0[j,] * (1 - tt[4])
-      
-      pred.data.t[,mediator] <- PredictMt
-      pred.data.c[,mediator] <- PredictMc
-      
-      #inner_loop_before_model_matrix(environment())
-      
-      if(get_context){
-        return(environment())
-      }
-      ymat.t <- model.matrix(terms(model.y), data=pred.data.t)
-      ymat.c <- model.matrix(terms(model.y), data=pred.data.c)
-      
-      #inner_loop_after_model_matrix(environment())
-      
-      Pr1[,j] <- t(as.matrix(YModel[j,])) %*% t(ymat.t)
-      Pr0[,j] <- t(as.matrix(YModel[j,])) %*% t(ymat.c)
-      
-      rm(ymat.t, ymat.c, pred.data.t, pred.data.c)
-    }
-    
-    effects.tmp[,,e] <- Pr1 - Pr0 ### e=1:mediation(1); e=2:mediation(0); e=3:direct(1); e=4:direct(0)
-    rm(Pr1, Pr0)
-  }
-  
-  rm(PredictM1, PredictM0, YModel, MModel)
-  
-  et1<-effects.tmp[,,1] ### mediation effect (1)
-  et2<-effects.tmp[,,2] ### mediation effect (0)
-  et3<-effects.tmp[,,3] ### direct effect (1)
-  et4<-effects.tmp[,,4] ### direct effect (0)
+  mediate_helper(environment())
   
   delta.1 <- t(as.matrix(apply(et1, 2, weighted.mean, w=weights)))
   delta.0 <- t(as.matrix(apply(et2, 2, weighted.mean, w=weights)))
   zeta.1 <- t(as.matrix(apply(et3, 2, weighted.mean, w=weights)))
   zeta.0 <- t(as.matrix(apply(et4, 2, weighted.mean, w=weights)))
-  rm(effects.tmp)
   
   tau <- (zeta.1 + delta.0 + zeta.0 + delta.1)/2
   nu.0 <- delta.0/tau
@@ -220,22 +150,4 @@ stripped_down_mediate <- function(model.m, model.y, sims = 1000, treat = "treat.
     paste(mediator,treat,sep=":") %in% attr(terms(model.y),"term.labels")
   
   return(SimpleMediateResult(direct_p = z.avg.p, indirect_p=d.avg.p))
-}
-
-example_data <- function(){
-  mdgp = MediateDataGenerationParameters(nSim=1)
-  data_matrix = generateDataMatrix(mdgp, 1)
-  lin_mdls = assembleLinearModels(data_matrix[[1]])
-  return(lin_mdls)
-}
-
-get_example_context <- function(){
-  ex_dat = example_data()
-  stripped_down_mediate(ex_dat@med.fit, ex_dat@out.fit, treat = "X",mediator = "M1",sims = 1000, get_context=T)
-}
-
-export_context <- function(envir, context){
-  for(n in ls(envir=context)){
-    envir[[n]] = context[[n]]
-  }
 }

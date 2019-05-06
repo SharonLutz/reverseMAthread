@@ -1,18 +1,4 @@
-setClass("SimpleMediateResult", 
-         representation = representation(
-           direct_p = "numeric",
-           indirect_p="numeric"
-           ),
-         prototype = prototype(
-           direct_p = 0,
-           indirect_p = 0
-         ),
-         validity = function(object){
-           if(object@direct_p<0 || object@direct_p>1){return ("direct p value must be between 0 and 1, inclusive")}
-           if(object@indirect_p<0 || object@indirect_p>1){return ("indirect p value must be between 0 and 1, inclusive")}
-         }
-         ) -> SimpleMediateResult
-
+#' @include pval_func.R
 #our calls always this style: mediate(model.m, model.y, treat= "X", mediator="M", sims = nSimImai)
 #both models are lm with no special types / conditions
 stripped_down_mediate <- function(model.m, model.y, sims = 1000, treat = "treat.name", mediator = "med.name",
@@ -71,12 +57,12 @@ stripped_down_mediate <- function(model.m, model.y, sims = 1000, treat = "treat.
   if(sum(is.na(MModel.coef)) > 0){
     stop("NA in model coefficients; rerun models with nonsingular design matrix")
   }
-  MModel <- rmvnorm(sims, mean=MModel.coef, sigma=MModel.var.cov)
+  MModel <- mvtnorm::rmvnorm(sims, mean=MModel.coef, sigma=MModel.var.cov)
   
   if(sum(is.na(YModel.coef)) > 0){
     stop("NA in model coefficients; rerun models with nonsingular design matrix")
   }
-  YModel <- rmvnorm(sims, mean=YModel.coef, sigma=YModel.var.cov)
+  YModel <- mvtnorm::rmvnorm(sims, mean=YModel.coef, sigma=YModel.var.cov)
   
   #####################################
   ##  Mediator Predictions
@@ -132,7 +118,9 @@ stripped_down_mediate <- function(model.m, model.y, sims = 1000, treat = "treat.
       
       ymat.t <- model.matrix(terms(model.y), data=pred.data.t)
       ymat.c <- model.matrix(terms(model.y), data=pred.data.c)
-      
+      print(dim(as.matrix(YModel[j,])))
+      print(dim(ymat.c))
+      return()
       Pr1[,j] <- t(as.matrix(YModel[j,])) %*% t(ymat.t)
       Pr0[,j] <- t(as.matrix(YModel[j,])) %*% t(ymat.c)
       

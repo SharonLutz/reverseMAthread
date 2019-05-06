@@ -58,7 +58,6 @@ function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,
   
   mat_total <- matrix(0,nrow=length(betaM),ncol=4)
   colnames(mat_total) <- c("DirectNR","IndirectNR","DirectR","IndirectR")
-  
   #generate the data needed to make linear models.
   data_matrix = generateDataMatrix(med_vars, SEED)
   print("running mediation on models")

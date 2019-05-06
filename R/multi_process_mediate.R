@@ -15,18 +15,26 @@ simulate_and_mediate <- function(med_model_vars){
   # Fit the mediation model
   set.seed(med_model_vars@SEED)
   
-  med.out <- mediate(models@med.fit, models@out.fit, treat = "X",mediator = "M1",sims = nSimImai)
-  med.out.r <- mediate(models@med.fit.r, models@out.fit.r, treat = "X",mediator = "M2",sims = nSimImai)
+  med.out <- stripped_down_mediate_with_rcpp(models@med.fit, models@out.fit, treat = "X",mediator = "M1",sims = nSimImai)
+  med.out.r <- stripped_down_mediate_with_rcpp(models@med.fit.r, models@out.fit.r, treat = "X",mediator = "M2",sims = nSimImai)
   
-  summary_obj = summary(med.out)
-  summary_obj.r = summary(med.out.r)
-  
-  return(MediationProbValues(
-    pval_direct = summary_obj$z.avg.p, 
-    pval_indirect = summary_obj$d.avg.p, 
-    pval_direct_r = summary_obj.r$z.avg.p,
-    pval_indirect_r = summary_obj.r$d.avg.p)
+  # summary_obj = summary(med.out)
+  # summary_obj.r = summary(med.out.r)
+  # 
+  # return(MediationProbValues(
+  #   pval_direct = summary_obj$z.avg.p, 
+  #   pval_indirect = summary_obj$d.avg.p, 
+  #   pval_direct_r = summary_obj.r$z.avg.p,
+  #   pval_indirect_r = summary_obj.r$d.avg.p)
+  #   )
+  return(
+    MediationProbValues(
+      pval_direct = med.out@direct_p,
+      pval_indirect = med.out@indirect_p,
+      pval_direct_r = med.out.r@direct_p,
+      pval_indirect_r = med.out.r@indirect_p
     )
+  )
 }
 
 #' @title Perform Mediation Using Parallel Processing

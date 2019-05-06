@@ -1,0 +1,7 @@
+devtools::load_all()
+param = reverseC::MediateDataGenerationParameters(nSim=1)
+data_item = reverseC::generateDataMatrix(param)[[1]]
+models = reverseC::assembleLinearModels(data_item)
+Rcpp::sourceCpp('src/mediation_helper_functions_no_threading.cpp')
+source('C:/Users/mgooch/Desktop/repos/reverseC/R/mediate_with_rcpp.R')
+tic("test");stripped_down_mediate_with_rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1");toc()
