@@ -769,7 +769,8 @@ void outer_loop(std::size_t e) {
 //*/
 void mediate_helper(Environment &env){
   Rcpp::Rcout<< "mediate_helper begin" << std::endl;
-  shared_vars.reset(new shared_local_mediate_variables(env));
+  //shared_vars.reset(new shared_local_mediate_variables(env));
+  shared_local_mediate_variables shared_vars(env);
   /*
   for(std::size_t e=0;e<4;++e){
     outer_loop(e);
@@ -782,7 +783,7 @@ void mediate_helper(Environment &env){
   env["et4"] = shared_vars->effects_tmp[3].to_Matrix();
   //*/
   Rcpp::Rcout<< "mediate_helper end" << std::endl;
-  shared_vars.reset();
+  //shared_vars.reset();
 }
 
 
@@ -799,12 +800,22 @@ shared_local_mediate_variables::shared_local_mediate_variables(Rcpp::Environment
   cat_1(env["cat.1"]),
   treat(Rcpp::as<std::string>(env["treat"])),
   mediator(Rcpp::as<std::string>(env["mediator"])),
-  PredictM0(DoubleMatrix::from_Rmatrix(Rcpp::as<NumericMatrix>(env["PredictM0"]))),
-  PredictM1(DoubleMatrix::from_Rmatrix(Rcpp::as<NumericMatrix>(env["PredictM1"]))),
-  YModel(DoubleMatrix::from_Rmatrix(Rcpp::as<NumericMatrix>(env["YModel"]))),
-  y_data(DoubleMatrix::from_RDataFrame(Rcpp::as<DataFrame>(env["y.data"]))),
+  PredictM0(1,1),
+  PredictM1(1,1),
+  YModel(1,1),
+  y_data(1,1),
   tt_switch({{{1,1,1,0},{0,0,1,0},{1,0,1,1},{1,0,0,0}}})
   {
+  NumericMatrix R_PredictM0 = Rcpp::as<NumericMatrix>(env["PredictM0"]);
+  NumericMatrix R_PredictM1 = Rcpp::as<NumericMatrix>(env["PredictM1"]);
+  NumericMatrix R_YModel = Rcpp::as<NumericMatrix>(env["YModel"]);
+  DataFrame R_y_data = Rcpp::as<DataFrame>(env["y.data"]);
+  /*/
+  PredictM0 = DoubleMatrix::from_Rmatrix(R_PredictM0);
+  PredictM1 = DoubleMatrix::from_Rmatrix(R_PredictM1);
+  YModel = DoubleMatrix::from_Rmatrix(R_YModel);
+  y_data = DoubleMatrix::from_RDataFrame(R_y_data);
+  //*/
   effects_tmp.reserve(4);
   for(std::size_t i=0;i<4;++i){
     shared_vars->effects_tmp.emplace_back(n, sims);
