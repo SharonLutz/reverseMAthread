@@ -2,7 +2,7 @@
 #our calls always this style: mediate(model.m, model.y, treat= "X", mediator="M", sims = nSimImai)
 #both models are lm with no special types / conditions
 stripped_down_mediate_with_rcpp <- function(model.m, model.y, sims = 1000, treat = "treat.name", mediator = "med.name",
-                                  conf.level = .95, control.value = 0, treat.value = 1){
+                                  conf.level = .95, control.value = 0, treat.value = 1, return_context=F){
   
   # Model frames for M and Y models
   m.data <- model.frame(model.m)  # Call.M$data
@@ -89,7 +89,9 @@ stripped_down_mediate_with_rcpp <- function(model.m, model.y, sims = 1000, treat
   #####################################
   ##  Outcome Predictions
   #####################################
-  
+  if(return_context){
+    return(environment())
+  }
   mediate_helper(environment())
   
   delta.1 <- t(as.matrix(apply(et1, 2, weighted.mean, w=weights)))
@@ -150,4 +152,11 @@ stripped_down_mediate_with_rcpp <- function(model.m, model.y, sims = 1000, treat
     paste(mediator,treat,sep=":") %in% attr(terms(model.y),"term.labels")
   
   return(SimpleMediateResult(direct_p = z.avg.p, indirect_p=d.avg.p))
+}
+
+export_environment <- function(env){
+  glob_env = globalenv()
+  for(item in names(env)){
+    glob_env[[item]] = env[[item]]
+  }
 }

@@ -5,6 +5,10 @@ mediate_helper <- function(env) {
     invisible(.Call(`_reverseC_mediate_helper`, env))
 }
 
+test <- function() {
+    invisible(.Call(`_reverseC_test`))
+}
+
 derp <- function(x) {
     .Call(`_reverseC_derp`, x)
 }

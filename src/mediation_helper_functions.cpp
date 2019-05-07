@@ -24,13 +24,15 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 void mediate_helper(Environment &env);
 // [[Rcpp::export]]
-NumericMatrix test();
+void test();
 // [[Rcpp::export]]
-NumericMatrix test1(NumericMatrix tmat);
+void test2(Environment &env);
 // [[Rcpp::export]]
-DataFrame test2(NumericMatrix tmat);
+DataFrame test3(DataFrame df);
 // [[Rcpp::export]]
-NumericMatrix test3(NumericMatrix tmat);
+void test4(DataFrame df);
+// [[Rcpp::export]]
+DataFrame test5(NumericMatrix mat);
 
 class DoubleMatrix{
 protected:
@@ -63,8 +65,8 @@ public:
   void set_col_names(Rcpp::CharacterVector col_names);
   void set_row_names(Rcpp::CharacterVector row_names);
   
-  void set_col_names(std::vector<std::string> &col_names);
-  void set_row_names(std::vector<std::string> &row_names);
+  void set_col_names(const std::vector<std::string> &col_names);
+  void set_row_names(const std::vector<std::string> &row_names);
   
   std::string get_row_name(std::size_t row_i);
   std::string get_col_name(std::size_t col_i);
@@ -134,16 +136,20 @@ DoubleMatrix::DoubleMatrix(const DoubleMatrix &other) :
   initialize_access();
   }
 DoubleMatrix& DoubleMatrix::operator=(const DoubleMatrix &other){
-  this->col_names_assigned = other.col_names_assigned;
-  this->row_names_assigned = other.row_names_assigned;
   this->transposed = other.transposed;
   this->num_rows = other.num_rows;
   this->num_cols = other.num_cols;
   this->data = other.data;
+  this->set_col_names(other.col_names);
+  this->set_row_names(other.row_names);
+  /*
   this->row_names = other.row_names;
   this->col_names = other.col_names;
   this->row_name_to_index = other.row_name_to_index;
   this->col_name_to_index = other.col_name_to_index;
+  this->col_names_assigned = other.col_names_assigned;
+  this->row_names_assigned = other.row_names_assigned;
+  //*/
   this->initialize_access();
   return (*this);
 }
@@ -201,7 +207,7 @@ double& DoubleMatrix::operator()(std::size_t row_i, std::size_t col_i){
     Rf_error(ss.str().c_str());
   }
   std::size_t real_index = this->transposed ? (col_i * row_count) + row_i : (row_i * col_count) + col_i;
-  Rcout << "using real index : " << real_index << " computed from [" << row_i << "," << col_i << ']' <<std::endl;
+  //Rcout << "using real index : " << real_index << " computed from [" << row_i << "," << col_i << ']' <<std::endl;
   return data[real_index];
 }
 
@@ -217,8 +223,11 @@ std::vector<double*>& DoubleMatrix::operator()(std::size_t row_i){
 void DoubleMatrix::set_col_names(Rcpp::CharacterVector col_names){
   std::vector<std::string> names;
   names.reserve(col_names.size());
+  Rcout << col_names << std::endl;
   for(long long i=0; i < col_names.size(); ++i){
-    names.push_back(Rcpp::as<std::string>(col_names[i]));
+    std::string col_name;
+    col_name=col_names[i];
+    names.push_back(col_name);
   }
   this->set_col_names(names);
 }
@@ -226,13 +235,16 @@ void DoubleMatrix::set_col_names(Rcpp::CharacterVector col_names){
 void DoubleMatrix::set_row_names(Rcpp::CharacterVector row_names){
   std::vector<std::string> names;
   names.reserve(row_names.size());
+  Rcout << row_names << std::endl;
   for(long long i=0; i < row_names.size(); ++i){
-    names.push_back(Rcpp::as<std::string>(row_names[i]));
+    std::string row_name;
+    row_name = row_names[i];
+    names.push_back(row_name);
   }
   this->set_row_names(names);
 }
 
-void DoubleMatrix::set_col_names(std::vector<std::string> &new_col_names){
+void DoubleMatrix::set_col_names(const std::vector<std::string> &new_col_names){
   std::size_t col_count = this->get_num_cols();
   if(col_count != new_col_names.size()){
     std::stringstream ss;
@@ -244,19 +256,23 @@ void DoubleMatrix::set_col_names(std::vector<std::string> &new_col_names){
     this->row_names.reserve(col_count);
     this->row_name_to_index.clear();
     for(std::size_t i=0; i < new_col_names.size(); ++i){
-      this->row_names.push_back(new_col_names[i]);
+      this->row_names.emplace_back(new_col_names[i]);
+      this->row_name_to_index[new_col_names[i]] = i;
     }
+    this->row_names_assigned = true;
   } else {
     this->col_names.clear();
     this->col_names.reserve(col_count);
     this->col_name_to_index.clear();
     for(std::size_t i=0; i < new_col_names.size(); ++i){
-      this->col_names.push_back(new_col_names[i]);
+      this->col_names.emplace_back(new_col_names[i]);
+      this->col_name_to_index[new_col_names[i]] = i;
     }
+    this->col_names_assigned = true;
   }
 }
 
-void DoubleMatrix::set_row_names(std::vector<std::string> &new_row_names){
+void DoubleMatrix::set_row_names(const std::vector<std::string> &new_row_names){
   std::size_t row_count = this->get_num_rows();
   if(row_count != new_row_names.size()){
     std::stringstream ss;
@@ -268,55 +284,57 @@ void DoubleMatrix::set_row_names(std::vector<std::string> &new_row_names){
     this->col_names.reserve(row_count);
     this->col_name_to_index.clear();
     for(std::size_t i=0; i < new_row_names.size(); ++i){
-      this->col_names.push_back(new_row_names[i]);
+      this->col_names.emplace_back(new_row_names[i]);
+      this->col_name_to_index[new_row_names[i]] = i;
     }
+    this->col_names_assigned = true;
   } else {
     this->row_names.clear();
     this->row_names.reserve(row_count);
     this->row_name_to_index.clear();
     for(std::size_t i=0; i < new_row_names.size(); ++i){
-      this->col_names.push_back(new_row_names[i]);
+      this->row_names.emplace_back(new_row_names[i]);
+      this->row_name_to_index[new_row_names[i]] = i;
     }
+    this->row_names_assigned = true;
   }
 }
 
 std::string DoubleMatrix::get_row_name(std::size_t row_i){
-  if(this->transposed){
-    if(this->col_names_assigned){
+  if(row_i >= this->get_num_rows()){
+    std::stringstream ss;
+    ss << "index out of bounds, " << row_i << " >= " << this->get_num_rows();
+    Rf_error(ss.str().c_str());
+  }
+  if((this->transposed && this->col_names_assigned) || ((!this->transposed) && this->row_names_assigned) ){
+    if(this->transposed){
       return this->col_names[row_i];
     } else {
-      std::stringstream ss;
-      ss << row_i;
-      return ss.str();
-    }
-  } else {
-    if(this->row_names_assigned){
       return this->row_names[row_i];
-    } else {
-      std::stringstream ss;
-      ss << row_i;
-      return ss.str();
     }
+  }else {
+    std::stringstream ss;
+    ss << row_i;
+    return ss.str();
   }
 }
 
 std::string DoubleMatrix::get_col_name(std::size_t col_i){
-  if(this->transposed){
-    if(this->row_names_assigned){
+  if(col_i >= this->get_num_cols()){
+    std::stringstream ss;
+    ss << "index out of bounds, " << col_i << " >= " << this->get_num_cols();
+    Rf_error(ss.str().c_str());
+  }
+  if((this->transposed && this->row_names_assigned) || ((!this->transposed) && this->col_names_assigned) ){
+    if(this->transposed){
       return this->row_names[col_i];
     } else {
-      std::stringstream ss;
-      ss << "V" << col_i;
-      return ss.str();
-    }
-  } else {
-    if(this->col_names_assigned){
       return this->col_names[col_i];
-    } else {
-      std::stringstream ss;
-      ss << "V" << col_i;
-      return ss.str();
     }
+  }else {
+    std::stringstream ss;
+    ss << "V" << col_i;
+    return ss.str();
   }
 }
 
@@ -532,19 +550,33 @@ DoubleMatrix DoubleMatrix::from_vector(std::vector<double> &svec, std::size_t nu
   return result;
 }
 
+template<int RTYPE>
+int get_vector_type_impl(Vector<RTYPE> xin){
+  return RTYPE;
+}
+
+int get_vector_type(SEXP xin){
+  RCPP_RETURN_VECTOR(get_vector_type_impl, xin);
+}
+
 DoubleMatrix DoubleMatrix::from_RDataFrame(Rcpp::DataFrame df){
-  IntegerVector dim = df.attr("dim");
-  DoubleMatrix result(dim[0], dim[1]);
+  std::size_t ncol = df.length();
+  std::size_t nrow = df.nrows();
+  DoubleMatrix result(nrow, ncol);
   CharacterVector col_names = df.attr("names");
-  CharacterVector row_names = df.attr("row.names");
-  for(long long col_i=0; col_i < dim[1];++col_i){
-    Rcpp::NumericVector row_vec = df[col_i];
-    for(long long row_i=0; row_i < dim[0];++row_i){
+  for(unsigned long long col_i=0; col_i < ncol;++col_i){
+    Rcpp::NumericVector row_vec = Rcpp::as<Rcpp::NumericVector>(df[col_i]);
+    for(unsigned long long row_i=0; row_i < nrow;++row_i){
       result(row_i,col_i) = row_vec[row_i];
     }
   }
   result.set_col_names(col_names);
-  result.set_row_names(row_names);
+  SEXP row_name_sexp = df.attr("row.names");
+  CharacterVector char_vec;
+  if(get_vector_type(row_name_sexp) == get_vector_type(char_vec)){
+    CharacterVector row_names = row_name_sexp;
+    result.set_row_names(row_names);
+  }
   return result;
 }
 
@@ -556,21 +588,21 @@ Rcpp::DataFrame DoubleMatrix::to_DataFrame(){
   for(std::size_t col_i =0; col_i < n_cols; ++col_i){
     Rcpp::NumericVector col_vec(n_rows);
     std::string col_name = this->get_col_name(col_i);
-    Rcout << "col_name[" << col_i << "]:" <<col_name<< std::endl;
+    //Rcout << "col_name[" << col_i << "]:" <<col_name<< std::endl;
     for(std::size_t row_i =0; row_i < n_rows; ++row_i){
       col_vec[row_i] = this->operator()(row_i, col_i);
     }
     result[col_name]=col_vec;
   }
   if(this->row_names_assigned){
-    Rcout << "row names assigned" << std::endl;
+    //Rcout << "row names assigned" << std::endl;
     CharacterVector row_names(n_rows);
     for(std::size_t row_i =0; row_i < n_rows; ++row_i){
       row_names[row_i] = this->get_row_name(row_i);
     }
     result.attr("row.names") = row_names;
   } else {
-    Rcout << "row names not assigned" << std::endl;
+    //Rcout << "row names not assigned" << std::endl;
     IntegerVector row_names(n_rows);
     for(std::size_t row_i =0; row_i < n_rows; ++row_i){
       row_names[row_i]=row_i;
@@ -598,14 +630,14 @@ struct shared_local_mediate_variables {
   int cat_1;
   std::string treat;
   std::string mediator;
+  std::array< std::array<int, 4>, 4 > tt_switch;
   DoubleMatrix PredictM0;
   DoubleMatrix PredictM1;
   DoubleMatrix YModel;
   DoubleMatrix y_data;
-  std::array< std::array<int, 4>, 4 > tt_switch;
-  
   std::vector<DoubleMatrix>effects_tmp;
-  shared_local_mediate_variables(Rcpp::Environment & env);
+  shared_local_mediate_variables();
+  static shared_local_mediate_variables from_environment(Rcpp::Environment & env);
 };
 
 std::unique_ptr<shared_local_mediate_variables> shared_vars;
@@ -782,7 +814,7 @@ void outer_loop(std::size_t e) {
 void mediate_helper(Environment &env){
   Rcpp::Rcout<< "mediate_helper begin" << std::endl;
   //shared_vars.reset(new shared_local_mediate_variables(env));
-  shared_local_mediate_variables shared_vars(env);
+  shared_local_mediate_variables shared_vars;
   /*
   for(std::size_t e=0;e<4;++e){
     outer_loop(e);
@@ -803,64 +835,74 @@ void mediate_helper(Environment &env){
 // (useful for testing and development). The R code will be automatically 
 // run after the compilation.
 //
+shared_local_mediate_variables::shared_local_mediate_variables() : 
+  PredictM0(0,0),
+  PredictM1(0,0),
+  YModel(0,0),
+  y_data(0,0){}
 
-
-shared_local_mediate_variables::shared_local_mediate_variables(Rcpp::Environment &env) : 
-  n(env["n"]),
-  sims(env["sims"]),
-  cat_0(env["cat.0"]),
-  cat_1(env["cat.1"]),
-  treat(Rcpp::as<std::string>(env["treat"])),
-  mediator(Rcpp::as<std::string>(env["mediator"])),
-  PredictM0(1,1),
-  PredictM1(1,1),
-  YModel(1,1),
-  y_data(1,1),
-  tt_switch({{{1,1,1,0},{0,0,1,0},{1,0,1,1},{1,0,0,0}}})
-  {
-  NumericMatrix R_PredictM0 = Rcpp::as<NumericMatrix>(env["PredictM0"]);
-  NumericMatrix R_PredictM1 = Rcpp::as<NumericMatrix>(env["PredictM1"]);
-  NumericMatrix R_YModel = Rcpp::as<NumericMatrix>(env["YModel"]);
-  DataFrame R_y_data = Rcpp::as<DataFrame>(env["y.data"]);
-  /*/
-  PredictM0 = DoubleMatrix::from_Rmatrix(R_PredictM0);
-  PredictM1 = DoubleMatrix::from_Rmatrix(R_PredictM1);
-  YModel = DoubleMatrix::from_Rmatrix(R_YModel);
-  y_data = DoubleMatrix::from_RDataFrame(R_y_data);
-  //*/
-  effects_tmp.reserve(4);
+shared_local_mediate_variables shared_local_mediate_variables::from_environment(Rcpp::Environment & env) {
+  shared_local_mediate_variables result;
+  result.tt_switch = {{{1,1,1,0},{0,0,1,0},{1,0,1,1},{1,0,0,0}}};
+  result.n = env["n"];
+  result.sims = env["sims"];
+  result.cat_0 = env["cat.0"];
+  result.cat_1 = env["cat.1"];
+  result.treat = Rcpp::as<std::string>(env["treat"]);
+  result.mediator = Rcpp::as<std::string>(env["mediator"]);
+  
+  NumericMatrix R_PredictM0 = env["PredictM0"];
+  NumericMatrix R_PredictM1 = env["PredictM1"];
+  NumericMatrix R_YModel = env["YModel"];
+  SEXP df_data = env["y.data"];
+  DataFrame R_y_data = df_data;
+  Rcout << "TEST0" << std::endl;
+  result.PredictM0 = DoubleMatrix::from_Rmatrix(R_PredictM0);
+  Rcout << "TEST1" << std::endl;
+  result.PredictM1 = DoubleMatrix::from_Rmatrix(R_PredictM1);
+  Rcout << "TEST2" << std::endl;
+  result.YModel = DoubleMatrix::from_Rmatrix(R_YModel);
+  Rcout << "TEST3" << std::endl;
+  result.y_data = DoubleMatrix::from_RDataFrame(R_y_data);
+  Rcout << "TEST4" << std::endl;
+  
+  result.effects_tmp.reserve(4);
   for(std::size_t i=0;i<4;++i){
-    shared_vars->effects_tmp.emplace_back(n, sims);
+    result.effects_tmp.emplace_back(result.n, result.sims);
+  }
+  return result;
+}
+
+void test(){
+  shared_local_mediate_variables shared_vars;
+}
+
+void test2(Environment &env){
+  shared_local_mediate_variables shared_vars = shared_local_mediate_variables::from_environment(env);
+}
+
+DataFrame test3(DataFrame df){
+  DoubleMatrix result = DoubleMatrix::from_RDataFrame(df);
+  for(std::size_t i =0 ;i < result.get_num_cols(); ++i ){
+    Rcout << result.get_col_name(i) << std::endl;
+  }
+  for(std::size_t i =0 ;i < result.get_num_rows(); ++i ){
+    Rcout << result.get_row_name(i) << std::endl;
+  }
+  return result.to_DataFrame();
+}
+
+void test4(DataFrame df){
+  DoubleMatrix result = DoubleMatrix::from_RDataFrame(df);
+  for(std::size_t i =0 ;i < result.get_num_cols(); ++i ){
+    Rcout << result.get_col_name(i) << std::endl;
+  }
+  for(std::size_t i =0 ;i < result.get_num_rows(); ++i ){
+    Rcout << result.get_row_name(i) << std::endl;
   }
 }
 
-NumericMatrix test(){
-  DoubleMatrix test(2,3);
-  *test(0)[0] = 1;
-  *test[1][0] = 2;
-  test(0,2) = 3;
-  test(1,0) = 4;
-  test(1,1) = 5;
-  test(1,2) = 6;
-  test.transpose();
-  return test.to_Matrix();
-}
-
-NumericMatrix test1(NumericMatrix tmat){
-  DoubleMatrix test(DoubleMatrix::from_Rmatrix(tmat));
-  test.transpose();
-  return test.to_Matrix();
-}
-
-DataFrame test2(NumericMatrix tmat){
-  Rcout << "test2 starting" << std::endl;
-  DoubleMatrix test(DoubleMatrix::from_Rmatrix(tmat));
-  return test.to_DataFrame();
-}
-
-NumericMatrix test3(NumericMatrix tmat){
-  DoubleMatrix test(DoubleMatrix::from_Rmatrix(tmat));
-  test.transpose();
-  test(0,2) = 123;
-  return test.to_Matrix();
+DataFrame test5(NumericMatrix mat){
+  DoubleMatrix result = DoubleMatrix::from_Rmatrix(mat);
+  return result.to_DataFrame();
 }

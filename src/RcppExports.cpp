@@ -15,6 +15,15 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// test
+void test();
+RcppExport SEXP _reverseC_test() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    test();
+    return R_NilValue;
+END_RCPP
+}
 // derp
 NumericVector derp(NumericVector x);
 RcppExport SEXP _reverseC_derp(SEXP xSEXP) {
@@ -29,6 +38,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_reverseC_mediate_helper", (DL_FUNC) &_reverseC_mediate_helper, 1},
+    {"_reverseC_test", (DL_FUNC) &_reverseC_test, 0},
     {"_reverseC_derp", (DL_FUNC) &_reverseC_derp, 1},
     {NULL, NULL, 0}
 };
