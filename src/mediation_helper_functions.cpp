@@ -437,8 +437,8 @@ DoubleMatrix DoubleMatrix::operator*(DoubleMatrix &other){
 }
 
 DoubleMatrix DoubleMatrix::operator+(DoubleMatrix &other){
-  bool rows_mismatch = this->get_num_rows() == other.get_num_rows();
-  bool cols_mismatch = this->get_num_cols() == other.get_num_cols();
+  bool rows_mismatch = this->get_num_rows() != other.get_num_rows();
+  bool cols_mismatch = this->get_num_cols() != other.get_num_cols();
   if(rows_mismatch || cols_mismatch){
     std::stringstream ss;
     ss << "index mismatch between matrices: ";
@@ -457,8 +457,8 @@ DoubleMatrix DoubleMatrix::operator+(DoubleMatrix &other){
 }
 
 DoubleMatrix DoubleMatrix::operator-(DoubleMatrix &other){
-  bool rows_mismatch = this->get_num_rows() == other.get_num_rows();
-  bool cols_mismatch = this->get_num_cols() == other.get_num_cols();
+  bool rows_mismatch = this->get_num_rows() != other.get_num_rows();
+  bool cols_mismatch = this->get_num_cols() != other.get_num_cols();
   if(rows_mismatch || cols_mismatch){
     std::stringstream ss;
     ss << "index mismatch between matrices: ";
