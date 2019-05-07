@@ -24,15 +24,9 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 void mediate_helper(Environment &env);
 // [[Rcpp::export]]
-void test();
+NumericMatrix cpp_mult(NumericMatrix m1, NumericMatrix m2);
 // [[Rcpp::export]]
-void test2(Environment &env);
-// [[Rcpp::export]]
-DataFrame test3(DataFrame df);
-// [[Rcpp::export]]
-void test4(DataFrame df);
-// [[Rcpp::export]]
-DataFrame test5(NumericMatrix mat);
+NumericMatrix cpp_tmult(NumericMatrix m1, NumericMatrix m2);
 
 class DoubleMatrix{
 protected:
@@ -84,6 +78,20 @@ public:
   
   void assign_column(std::vector<double*> col, std::string& col_name);
   void assign_row(std::vector<double*> row, std::string& row_name);
+  
+  
+  void assign_column(std::vector<double> col, std::size_t col_i);
+  void assign_row(std::vector<double> row, std::size_t row_i);
+  
+  void assign_column(std::vector<double> col, std::string& col_name);
+  void assign_row(std::vector<double> row, std::string& row_name);
+  
+  
+  void assign_column(double val, std::size_t col_i);
+  void assign_row(double val, std::size_t row_i);
+  
+  void assign_column(double val, std::string& col_name);
+  void assign_row(double val, std::string& row_name);
   
   DoubleMatrix operator*(DoubleMatrix &other);
   DoubleMatrix operator+(DoubleMatrix &other);
@@ -140,8 +148,12 @@ DoubleMatrix& DoubleMatrix::operator=(const DoubleMatrix &other){
   this->num_rows = other.num_rows;
   this->num_cols = other.num_cols;
   this->data = other.data;
-  this->set_col_names(other.col_names);
-  this->set_row_names(other.row_names);
+  if(other.col_names_assigned){
+    this->set_col_names(other.col_names);
+  }
+  if(other.row_names_assigned){
+    this->set_row_names(other.row_names);
+  }
   /*
   this->row_names = other.row_names;
   this->col_names = other.col_names;
@@ -223,7 +235,7 @@ std::vector<double*>& DoubleMatrix::operator()(std::size_t row_i){
 void DoubleMatrix::set_col_names(Rcpp::CharacterVector col_names){
   std::vector<std::string> names;
   names.reserve(col_names.size());
-  Rcout << col_names << std::endl;
+  //Rcout << col_names << std::endl;
   for(long long i=0; i < col_names.size(); ++i){
     std::string col_name;
     col_name=col_names[i];
@@ -235,7 +247,7 @@ void DoubleMatrix::set_col_names(Rcpp::CharacterVector col_names){
 void DoubleMatrix::set_row_names(Rcpp::CharacterVector row_names){
   std::vector<std::string> names;
   names.reserve(row_names.size());
-  Rcout << row_names << std::endl;
+  //Rcout << row_names << std::endl;
   for(long long i=0; i < row_names.size(); ++i){
     std::string row_name;
     row_name = row_names[i];
@@ -405,6 +417,10 @@ DoubleMatrix DoubleMatrix::operator*(DoubleMatrix &other){
   
   DoubleMatrix result(rows_1, cols_2);
   
+  Rcout << "dim1["<<rows_1<<','<<cols_1<<"]; dim2["<<rows_2<<','<<cols_2<<']'<<std::endl;
+  
+  return result;
+  
   for(unsigned long long int result_row_i=0;result_row_i<rows_1;++result_row_i){
     auto &row_1_i = this->operator()(result_row_i);
     for(unsigned long long int result_col_i=0; result_col_i<cols_2;++result_col_i){
@@ -492,6 +508,135 @@ DoubleMatrix DoubleMatrix::operator/(double scalar){
   return result;
 }
 
+void DoubleMatrix::assign_column(std::vector<double*> col, std::size_t col_i){
+  std::vector<double *> target = this->operator[](col_i);
+  if(col.size() != target.size()){
+    std::stringstream ss;
+    ss << "dimension mismatch : " << target.size() << " vs "<< col.size();
+    Rf_error(ss.str().c_str());
+  }
+  for(std::size_t i=0;i<target.size();++i){
+    *target[i] = *col[i];
+  }
+}
+
+void DoubleMatrix::assign_row(std::vector<double*> row, std::size_t row_i){
+  std::vector<double *> target = this->operator()(row_i);
+  if(row.size() != target.size()){
+    std::stringstream ss;
+    ss << "dimension mismatch : " << target.size() << " vs "<< row.size();
+    Rf_error(ss.str().c_str());
+  }
+  for(std::size_t i=0;i<target.size();++i){
+    *target[i] = *row[i];
+  }
+}
+
+void DoubleMatrix::assign_column(std::vector<double*> col, std::string& col_name){
+  std::vector<double *> target = this->operator[](col_name);
+  if(col.size() != target.size()){
+    std::stringstream ss;
+    ss << "dimension mismatch : " << target.size() << " vs "<< col.size();
+    Rf_error(ss.str().c_str());
+  }
+  for(std::size_t i=0;i<target.size();++i){
+    *target[i] = *col[i];
+  }
+}
+
+void DoubleMatrix::assign_row(std::vector<double*> row, std::string& row_name){
+  std::vector<double *> target = this->operator()(row_name);
+  if(row.size() != target.size()){
+    std::stringstream ss;
+    ss << "dimension mismatch : " << target.size() << " vs "<< row.size();
+    Rf_error(ss.str().c_str());
+  }
+  for(std::size_t i=0;i<target.size();++i){
+    *target[i] = *row[i];
+  }
+}
+
+void DoubleMatrix::assign_column(std::vector<double> col, std::size_t col_i){
+  std::vector<double *> target = this->operator[](col_i);
+  if(col.size() != target.size()){
+    std::stringstream ss;
+    ss << "dimension mismatch : " << target.size() << " vs "<< col.size();
+    Rf_error(ss.str().c_str());
+  }
+  for(std::size_t i=0;i<target.size();++i){
+    *target[i] = col[i];
+  }
+}
+
+void DoubleMatrix::assign_row(std::vector<double> row, std::size_t row_i){
+  std::vector<double *> target = this->operator()(row_i);
+  if(row.size() != target.size()){
+    std::stringstream ss;
+    ss << "dimension mismatch : " << target.size() << " vs "<< row.size();
+    Rf_error(ss.str().c_str());
+  }
+  for(std::size_t i=0;i<target.size();++i){
+    *target[i] = row[i];
+  }
+}
+
+void DoubleMatrix::assign_column(std::vector<double> col, std::string& col_name){
+  std::vector<double *> target = this->operator[](col_name);
+  if(col.size() != target.size()){
+    std::stringstream ss;
+    ss << "dimension mismatch : " << target.size() << " vs "<< col.size();
+    Rf_error(ss.str().c_str());
+  }
+  for(std::size_t i=0;i<target.size();++i){
+    *target[i] = col[i];
+  }
+}
+
+void DoubleMatrix::assign_row(std::vector<double> row, std::string& row_name){
+  std::vector<double *> target = this->operator()(row_name);
+  if(row.size() != target.size()){
+    std::stringstream ss;
+    ss << "dimension mismatch : " << target.size() << " vs "<< row.size();
+    Rf_error(ss.str().c_str());
+  }
+  for(std::size_t i=0;i<target.size();++i){
+    *target[i] = row[i];
+  }
+}
+
+
+void DoubleMatrix::assign_column(double val, std::string& col_name){
+  std::vector<double *> target = this->operator[](col_name);
+  
+  for(std::size_t i=0;i<target.size();++i){
+    *target[i] = val;
+  }
+}
+
+void DoubleMatrix::assign_row(double val, std::string& row_name){
+  std::vector<double *> target = this->operator()(row_name);
+  
+  for(std::size_t i=0;i<target.size();++i){
+    *target[i] = val;
+  }
+}
+
+void DoubleMatrix::assign_column(double val, std::size_t col_i){
+  std::vector<double *> target = this->operator[](col_i);
+  
+  for(std::size_t i=0;i<target.size();++i){
+    *target[i] = val;
+  }
+}
+
+void DoubleMatrix::assign_row(double val, std::size_t row_i){
+  std::vector<double *> target = this->operator()(row_i);
+  
+  for(std::size_t i=0;i<target.size();++i){
+    *target[i] = val;
+  }
+}
+
 DoubleMatrix DoubleMatrix::from_Rmatrix(Rcpp::NumericMatrix mat){
   IntegerVector dim = mat.attr("dim");
   DoubleMatrix result(dim[0], dim[1]);
@@ -507,7 +652,7 @@ DoubleMatrix DoubleMatrix::from_Rvector(Rcpp::NumericVector vec){
   std::size_t num_rows = vec.length();
   DoubleMatrix result(num_rows, 1);
   for(unsigned long long row_i=0; row_i < num_rows;++row_i){
-    result(row_i, 1) = vec[row_i];
+    result(row_i, 0) = vec[row_i];
   }
   return result;
 }
@@ -516,7 +661,7 @@ DoubleMatrix DoubleMatrix::from_vector(std::vector<double> &svec){
   std::size_t num_rows = svec.size();
   DoubleMatrix result(num_rows, 1);
   for(unsigned long long row_i=0; row_i < num_rows;++row_i){
-    result(row_i, 1) = svec[row_i];
+    result(row_i, 0) = svec[row_i];
   }
   return result;
 }
@@ -525,6 +670,7 @@ DoubleMatrix DoubleMatrix::from_Rvector(Rcpp::NumericVector vec, std::size_t num
   std::size_t veclen = vec.length();
   if(num_rows * num_cols != veclen){
     std::stringstream ss;
+    ss << "rows and columns do not match incoming vector length";
     Rf_error(ss.str().c_str());
   }
   DoubleMatrix result(num_rows, num_cols);
@@ -539,6 +685,7 @@ DoubleMatrix DoubleMatrix::from_Rvector(Rcpp::NumericVector vec, std::size_t num
 DoubleMatrix DoubleMatrix::from_vector(std::vector<double> &svec, std::size_t num_rows, std::size_t num_cols){
   if(num_rows * num_cols != svec.size()){
     std::stringstream ss;
+    ss << "rows and columns do not match incoming vector length";
     Rf_error(ss.str().c_str());
   }
   DoubleMatrix result(num_rows, num_cols);
@@ -620,6 +767,20 @@ Rcpp::NumericMatrix DoubleMatrix::to_Matrix(){
       result(row_i,col_i) = this->operator()(row_i, col_i);
     }
   }
+  if(this->row_names_assigned){
+    if(this->transposed){
+      colnames(result) = wrap(this->row_names);
+    } else {
+      rownames(result) = wrap(this->row_names);
+    }
+  }
+  if(this->col_names_assigned){
+    if(this->transposed){
+      rownames(result) = wrap(this->col_names);
+    } else {
+      colnames(result) = wrap(this->col_names);
+    }
+  }
   return result;
 }
 
@@ -630,6 +791,7 @@ struct shared_local_mediate_variables {
   int cat_1;
   std::string treat;
   std::string mediator;
+  std::vector<std::string> terms;
   std::array< std::array<int, 4>, 4 > tt_switch;
   DoubleMatrix PredictM0;
   DoubleMatrix PredictM1;
@@ -639,197 +801,6 @@ struct shared_local_mediate_variables {
   shared_local_mediate_variables();
   static shared_local_mediate_variables from_environment(Rcpp::Environment & env);
 };
-
-std::unique_ptr<shared_local_mediate_variables> shared_vars;
-
-NumericMatrix pred_to_model_mat(DataFrame &pred_mat){
-  Rcpp::Language terms = pred_mat.attr("terms");
-  CharacterVector term_labels = terms.attr("term.labels");
-  GenericVector row_names = pred_mat.attr("row.names");
-  CharacterVector names = pred_mat.attr("names");
-  
-  long long int nrows = row_names.size();
-  long long int nterms = term_labels.size();
-  
-  /*
-  for(long long int col_i=0;col_i<nterms;++col_i){
-    std::string s = Rcpp::as<std::string>(term_labels[col_i]);
-    Rcout << s << std::endl;
-  }
-  //*/
-  
-  NumericMatrix model_mat(nrows, nterms+1);
-  for(long long int row_i=0;row_i<nrows;++row_i){
-    model_mat(row_i,0) = 1.0;
-  }
-  for(long long int col_i=0;col_i<nterms;++col_i){
-    std::string s;
-    s = term_labels[col_i];
-    NumericVector col = pred_mat[s];
-    for(long long int row_i=0;row_i<nrows;++row_i){
-      model_mat(row_i,col_i+1) = col[row_i];
-    }
-  }
-  return model_mat;
-}
-
-NumericMatrix cpp_matrix_mult(NumericMatrix& m1, NumericMatrix& m2){
-  IntegerVector dim1 = m1.attr("dim");
-  IntegerVector dim2 = m2.attr("dim");
-  unsigned long long cols_1 = dim1[1];
-  unsigned long long rows_2 = dim2[0];
-  NumericMatrix result(dim1[0], dim2[1]);
-  if(cols_1 != rows_2){
-    std::stringstream ss;
-    ss << "The dimensions of these matrices are not compatible for matrix multiplication: dim1: [";
-    ss << dim1[0] << "," << dim1[1] << "]; dim2: [" << dim2[0] << "," << dim2[1] << "]";
-    Rf_error(ss.str().c_str());
-  }
-  for(long long int result_row_i=0;result_row_i<dim1[0];++result_row_i){
-    for(long long int result_col_i=0; result_col_i<dim2[1];++result_col_i){
-      result(result_row_i, result_col_i) = sum(m1(result_row_i,_) * m2(_,result_col_i));
-    }
-  }
-  
-  return result;
-}
-
-
-
-NumericMatrix cpp_matrix_mult_of_transposed(NumericMatrix& m1, NumericMatrix& m2){
-  IntegerVector dim1 = m1.attr("dim");
-  IntegerVector dim2 = m2.attr("dim");
-  unsigned long long cols_1 = dim1[0];
-  unsigned long long rows_2 = dim2[1];
-  NumericMatrix result(dim1[1], dim2[0]);
-  if(cols_1 != rows_2){
-    std::stringstream ss;
-    ss << "The dimensions of these matrices are not compatible for matrix multiplication: dim1: [";
-    ss << dim1[1] << "," << dim1[0] << "]; dim2: [" << dim2[1] << "," << dim2[0] << "]";
-    Rf_error(ss.str().c_str());
-  }
-  for(long long int result_row_i=0;result_row_i<dim1[1];++result_row_i){
-    for(long long int result_col_i=0; result_col_i<dim2[0];++result_col_i){
-      result(result_row_i, result_col_i) = sum(m1(_,result_row_i) * m2(result_col_i,_));
-    }
-  }
-  
-  return result;
-}
-
-bool compare_vect(const IntegerVector &v1, const IntegerVector &v2){
-  if(v1.length() != v2.length()){
-    return false;
-  }
-  for(long long int i=0;i<v1.length();++i){
-    if(v1[i] != v2[i]){
-      return false;
-    }
-  }
-  return true;
-}
-
-NumericMatrix subtract_matrices(const NumericMatrix& mat1, const NumericMatrix &mat2){
-  if(!compare_vect(mat1.attr("dim"),mat2.attr("dim"))){
-    Rf_error("Matrix Dimensions do not match");
-  }
-  IntegerVector dimv=mat1.attr("dim");
-  NumericMatrix result(dimv[0],dimv[1]);
-  long long int total_len = dimv[0]*dimv[1];
-  for(long long int i=0;i<total_len;++i){
-    result[i] = mat1[i] - mat2[i];
-  }
-  return result;
-}
-/*
-void inner_loop(
-    std::array<int, 4>& tt,
-    std::size_t j, 
-    NumericMatrix &Pr1, 
-    NumericMatrix &Pr0,
-    int cat_t,
-    int cat_t_ctrl,
-    int cat_c,
-    int cat_c_ctrl
-    ) {
-  Rcpp::Rcout << "inner: " << j << std::endl;
-  
-  DataFrame pred_data_t = Rcpp::clone(shared_vars->y_data);
-  
-  DataFrame pred_data_c = Rcpp::clone(shared_vars->y_data);
-  
-  pred_data_t[shared_vars->treat] = cat_t;
-  pred_data_c[shared_vars->treat] = cat_c;
-
-  //PredictMt <- PredictM1[j,] * tt[3] + PredictM0[j,] * (1 - tt[3])
-  //PredictMc <- PredictM1[j,] * tt[4] + PredictM0[j,] * (1 - tt[4])
-  NumericVector PredictMt = (shared_vars->PredictM1(j,_) * tt[2]) + (shared_vars->PredictM0(j,_) * (1 - tt[2]));
-  NumericVector PredictMc = (shared_vars->PredictM1(j,_) * tt[3]) + (shared_vars->PredictM0(j,_) * (1 - tt[3]));
-  
-  //pred.data.t[,mediator] <- PredictMt
-  //pred.data.c[,mediator] <- PredictMc
-  NumericVector pred_data_t_med_vec = pred_data_t[shared_vars->mediator];
-  NumericVector pred_data_c_med_vec = pred_data_c[shared_vars->mediator];
-  
-  for(int i=0; i < pred_data_t_med_vec.size(); ++i){
-    pred_data_t_med_vec[i] = PredictMt[i];
-  }
-  for(int i=0; i < pred_data_c_med_vec.size(); ++i){
-    pred_data_c_med_vec[i] = PredictMc[i];
-  }
-  
-  NumericMatrix ymat_t = pred_to_model_mat(pred_data_t);
-  NumericMatrix ymat_c = pred_to_model_mat(pred_data_c);
-  
-  NumericVector YModel_j_vec = shared_vars->YModel(j,_);
-
-  //NumericMatrix YModel_j_as_matrix(YModel_j_vec.size(),1);
-  //YModel_j_as_matrix(_,YModel_j_vec.size()) = YModel_j_vec;
-  
-  NumericMatrix YModel_j_as_matrix(YModel_j_vec.size(), 1, YModel_j_vec.begin());
-  
-  Pr1(_,j) = cpp_matrix_mult_of_transposed(YModel_j_as_matrix,ymat_t);
-  Pr0(_,j) = cpp_matrix_mult_of_transposed(YModel_j_as_matrix,ymat_c);
-  
-}
-
-void outer_loop(std::size_t e) {
-  Rcpp::Rcout<< "outer_loop begin: " << e << std::endl;
-  std::array<int, 4>& tt = shared_vars->tt_switch[e];
-  NumericMatrix Pr1(shared_vars->n, shared_vars->sims);
-  NumericMatrix Pr0(shared_vars->n, shared_vars->sims);
-  int cat_t = tt[0] ? shared_vars->cat_1 : shared_vars->cat_0;
-  int cat_t_ctrl = tt[1] ? shared_vars->cat_1 : shared_vars->cat_0;
-  int cat_c = tt[0] ? shared_vars->cat_0 : shared_vars->cat_1;
-  int cat_c_ctrl = tt[1] ? shared_vars->cat_0 : shared_vars->cat_1;
-  
-  for(int j=0; j < shared_vars->sims; ++j){
-    inner_loop(tt, j, Pr1, Pr0, cat_t, cat_t_ctrl, cat_c, cat_c_ctrl);
-  }
-  
-  shared_vars->effects_tmp[e] = subtract_matrices(Pr1, Pr0);
-  Rcpp::Rcout<< "outer_loop end: " << e << std::endl;
-}
-//*/
-void mediate_helper(Environment &env){
-  Rcpp::Rcout<< "mediate_helper begin" << std::endl;
-  //shared_vars.reset(new shared_local_mediate_variables(env));
-  shared_local_mediate_variables shared_vars;
-  /*
-  for(std::size_t e=0;e<4;++e){
-    outer_loop(e);
-  }
-   //*/
-   /*
-  env["et1"] = shared_vars->effects_tmp[0].to_Matrix();
-  env["et2"] = shared_vars->effects_tmp[1].to_Matrix();
-  env["et3"] = shared_vars->effects_tmp[2].to_Matrix();
-  env["et4"] = shared_vars->effects_tmp[3].to_Matrix();
-  //*/
-  Rcpp::Rcout<< "mediate_helper end" << std::endl;
-  //shared_vars.reset();
-}
-
 
 // You can include R code blocks in C++ files processed with sourceCpp
 // (useful for testing and development). The R code will be automatically 
@@ -856,53 +827,310 @@ shared_local_mediate_variables shared_local_mediate_variables::from_environment(
   NumericMatrix R_YModel = env["YModel"];
   SEXP df_data = env["y.data"];
   DataFrame R_y_data = df_data;
-  Rcout << "TEST0" << std::endl;
+  
+  Rcpp::Language terms = R_y_data.attr("terms");
+  CharacterVector term_labels = terms.attr("term.labels");
+  
+  for(long long int i=0;i<term_labels.size();++i){
+    std::string label;
+    label = term_labels[i];
+    result.terms.emplace_back(label);
+  }
+  
   result.PredictM0 = DoubleMatrix::from_Rmatrix(R_PredictM0);
-  Rcout << "TEST1" << std::endl;
   result.PredictM1 = DoubleMatrix::from_Rmatrix(R_PredictM1);
-  Rcout << "TEST2" << std::endl;
+  
   result.YModel = DoubleMatrix::from_Rmatrix(R_YModel);
-  Rcout << "TEST3" << std::endl;
   result.y_data = DoubleMatrix::from_RDataFrame(R_y_data);
-  Rcout << "TEST4" << std::endl;
   
   result.effects_tmp.reserve(4);
   for(std::size_t i=0;i<4;++i){
     result.effects_tmp.emplace_back(result.n, result.sims);
   }
+  
   return result;
 }
 
-void test(){
-  shared_local_mediate_variables shared_vars;
+bool compare_vect(const IntegerVector &v1, const IntegerVector &v2){
+  if(v1.length() != v2.length()){
+    return false;
+  }
+  for(long long int i=0;i<v1.length();++i){
+    if(v1[i] != v2[i]){
+      return false;
+    }
+  }
+  return true;
 }
 
-void test2(Environment &env){
+//operator*
+std::vector<double> operator*(std::vector<double> v1, std::vector<double> v2){
+  std::vector<double> result = v1;
+  for(std::size_t i=0;i<result.size();++i){
+    result[i] = result[i] * v2[i];
+  }
+  return result;
+}
+
+std::vector<double> operator*(std::vector<double> v, double val){
+  std::vector<double> result=v;
+  for(std::size_t i=0;i<result.size();++i){
+    result[i] = result[i] * val;
+  }
+  return result;
+}
+
+std::vector<double> operator*(double val, std::vector<double> v){
+  std::vector<double> result=v;
+  for(std::size_t i=0;i<result.size();++i){
+    result[i] = result[i] * val;
+  }
+  return result;
+}
+//operator+
+std::vector<double> operator+(std::vector<double> v1, std::vector<double> v2){
+  std::vector<double> result = v1;
+  for(std::size_t i=0;i<result.size();++i){
+    result[i] = result[i] + v2[i];
+  }
+  return result;
+}
+
+std::vector<double> operator+(std::vector<double> v, double val){
+  std::vector<double> result=v;
+  for(std::size_t i=0;i<result.size();++i){
+    result[i] = result[i] + val;
+  }
+  return result;
+}
+
+std::vector<double> operator+(double val, std::vector<double> v){
+  std::vector<double> result=v;
+  for(std::size_t i=0;i<result.size();++i){
+    result[i] = result[i] + val;
+  }
+  return result;
+}
+//operator-
+std::vector<double> operator-(std::vector<double> v1, std::vector<double> v2){
+  std::vector<double> result = v1;
+  for(std::size_t i=0;i<result.size();++i){
+    result[i] = result[i] - v2[i];
+  }
+  return result;
+}
+
+std::vector<double> operator-(std::vector<double> v, double val){
+  std::vector<double> result=v;
+  for(std::size_t i=0;i<result.size();++i){
+    result[i] = result[i] - val;
+  }
+  return result;
+}
+
+std::vector<double> operator-(double val, std::vector<double> v){
+  std::vector<double> result=v;
+  for(std::size_t i=0;i<result.size();++i){
+    result[i] = val - result[i];
+  }
+  return result;
+}
+//operator/
+std::vector<double> operator/(std::vector<double> v1, std::vector<double> v2){
+  std::vector<double> result = v1;
+  for(std::size_t i=0;i<result.size();++i){
+    result[i] = result[i] / v2[i];
+  }
+  return result;
+}
+
+std::vector<double> operator/(std::vector<double> v, double val){
+  std::vector<double> result=v;
+  for(std::size_t i=0;i<result.size();++i){
+    result[i] = result[i] / val;
+  }
+  return result;
+}
+
+std::vector<double> operator/(double val, std::vector<double> v){
+  std::vector<double> result=v;
+  for(std::size_t i=0;i<result.size();++i){
+    result[i] = val / result[i];
+  }
+  return result;
+}
+
+DoubleMatrix pred_to_model_mat(shared_local_mediate_variables& sv, DoubleMatrix &pred_mat){
+  unsigned long long int nrows = pred_mat.get_num_rows();
+  unsigned long long int nterms = sv.terms.size();
+  
+  DoubleMatrix model_mat(nrows, nterms+1);
+  std::vector<std::string> col_names{"(intercept)"};
+  
+  for(std::size_t i=0;i<nterms;++i){
+    col_names.push_back(sv.terms[i]);
+  }
+  
+  model_mat.set_col_names(col_names);
+  
+  for(unsigned long long int row_i=0;row_i<nrows;++row_i){
+    model_mat(row_i,0) = 1.0;
+  }
+  
+  for(unsigned long long int col_i=0;col_i<nterms;++col_i){
+    std::string term_label;
+    term_label = sv.terms[col_i];
+    model_mat.assign_column(pred_mat[term_label], col_i);
+  }
+  
+  
+  
+  return model_mat;
+}
+
+std::vector<double> wrap_DoubleMatrix_column_or_row(std::vector<double*> vec){
+  std::vector<double> result;
+  result.reserve(vec.size());
+  for(std::size_t i=0;i<vec.size();++i){
+    result.push_back(*vec[i]);
+  }
+  return result;
+}
+
+//*
+void inner_loop(
+    shared_local_mediate_variables& sv,
+    std::array<int, 4>& tt,
+std::size_t j, 
+DoubleMatrix &Pr1, 
+DoubleMatrix &Pr0,
+int cat_t,
+int cat_t_ctrl,
+int cat_c,
+int cat_c_ctrl
+) {
+Rcpp::Rcout << "inner: " << j << std::endl;
+
+DoubleMatrix pred_data_t = sv.y_data;
+
+DoubleMatrix pred_data_c = sv.y_data;
+
+Rcpp::Rcout << "TEST0" << std::endl;
+
+pred_data_t.assign_column(cat_t, sv.treat);
+pred_data_c.assign_column(cat_c, sv.treat);
+
+Rcpp::Rcout << "TEST1" << std::endl;
+
+//PredictMt <- PredictM1[j,] * tt[3] + PredictM0[j,] * (1 - tt[3])
+//PredictMc <- PredictM1[j,] * tt[4] + PredictM0[j,] * (1 - tt[4])
+
+double tt_val_2 = tt[2];
+double tt_val_3 = tt[3];
+
+Rcpp::Rcout << "sv.PredictM1(j) size: " << sv.PredictM1(j).size() << std::endl;
+Rcpp::Rcout << "sv.PredictM0(j) size: " << sv.PredictM0(j).size() << std::endl;
+
+std::vector<double> PredictM1_row_j = wrap_DoubleMatrix_column_or_row(sv.PredictM1(j));
+std::vector<double> PredictM0_row_j = wrap_DoubleMatrix_column_or_row(sv.PredictM0(j));
+
+Rcpp::Rcout << "PredictM1_row_j size: " << PredictM1_row_j.size() << std::endl;
+Rcpp::Rcout << "PredictM0_row_j size: " << PredictM0_row_j.size() << std::endl;
+
+std::vector<double> PredictMt = (PredictM1_row_j * tt_val_2) + (PredictM0_row_j * (1-tt_val_2));
+std::vector<double> PredictMc = (PredictM1_row_j * tt_val_3) + (PredictM0_row_j * (1-tt_val_3));
+//NumericVector PredictMt = (sv.PredictM1(j,_) * tt[2]) + (sv.PredictM0(j,_) * (1 - tt[2]));
+//NumericVector PredictMc = (sv.PredictM1(j,_) * tt[3]) + (sv.PredictM0(j,_) * (1 - tt[3]));
+
+Rcpp::Rcout << "PredictMt size: " << PredictMt.size() << std::endl;
+Rcpp::Rcout << "PredictMc size: " << PredictMc.size() << std::endl;
+
+Rcpp::Rcout << "TEST2" << std::endl;
+
+//pred.data.t[,mediator] <- PredictMt
+//pred.data.c[,mediator] <- PredictMc
+pred_data_t.assign_column(PredictMt, sv.mediator);
+pred_data_c.assign_column(PredictMc, sv.mediator);
+
+Rcpp::Rcout << "TEST3" << std::endl;
+
+DoubleMatrix ymat_t = pred_to_model_mat(sv, pred_data_t);
+DoubleMatrix ymat_c = pred_to_model_mat(sv, pred_data_c);
+
+Rcpp::Rcout << "TEST4" << std::endl;
+
+std::vector<double> YModel_row_j =  wrap_DoubleMatrix_column_or_row(sv.YModel(j));
+
+DoubleMatrix YModel_j_as_matrix = DoubleMatrix::from_vector(YModel_row_j);
+
+Rcpp::Rcout << "TEST5" << std::endl;
+
+YModel_j_as_matrix.transpose();
+ymat_t.transpose();
+ymat_c.transpose();
+
+Rcpp::Rcout << "TEST6" << std::endl;
+
+DoubleMatrix mmult1 = YModel_j_as_matrix * ymat_t;
+DoubleMatrix mmult2 = YModel_j_as_matrix * ymat_t;
+
+Rcpp::Rcout << "TEST7" << std::endl;
+
+Rcout << mmult1.get_num_rows() << ',' << mmult1.get_num_cols() << std::endl;
+Rcout << mmult2.get_num_rows() << ',' << mmult2.get_num_cols() << std::endl;
+//Pr1(_,j) = cpp_matrix_mult_of_transposed(YModel_j_as_matrix,ymat_t);
+//Pr0(_,j) = cpp_matrix_mult_of_transposed(YModel_j_as_matrix,ymat_c);
+}
+
+void outer_loop(shared_local_mediate_variables& sv, std::size_t e) {
+Rcpp::Rcout<< "outer_loop begin: " << e << std::endl;
+std::array<int, 4>& tt = sv.tt_switch[e];
+DoubleMatrix Pr1(sv.n, sv.sims);
+DoubleMatrix Pr0(sv.n, sv.sims);
+int cat_t = tt[0] ? sv.cat_1 : sv.cat_0;
+int cat_t_ctrl = tt[1] ? sv.cat_1 : sv.cat_0;
+int cat_c = tt[0] ? sv.cat_0 : sv.cat_1;
+int cat_c_ctrl = tt[1] ? sv.cat_0 : sv.cat_1;
+
+for(int j=0; j < sv.sims; ++j){
+inner_loop(sv, tt, j, Pr1, Pr0, cat_t, cat_t_ctrl, cat_c, cat_c_ctrl);
+}
+
+sv.effects_tmp[e] = Pr1 - Pr0;
+Rcpp::Rcout<< "outer_loop end: " << e << std::endl;
+}
+//*/
+
+
+void mediate_helper(Environment &env){
+  Rcpp::Rcout<< "mediate_helper begin" << std::endl;
+  //shared_vars.reset(new shared_local_mediate_variables(env));
   shared_local_mediate_variables shared_vars = shared_local_mediate_variables::from_environment(env);
+  //*
+  for(std::size_t e=0;e<4;++e){
+  outer_loop(shared_vars, e);
+  }
+  //*/
+  //*
+  env["et1"] = shared_vars.effects_tmp[0].to_Matrix();
+  env["et2"] = shared_vars.effects_tmp[1].to_Matrix();
+  env["et3"] = shared_vars.effects_tmp[2].to_Matrix();
+  env["et4"] = shared_vars.effects_tmp[3].to_Matrix();
+  //*/
+  Rcpp::Rcout<< "mediate_helper end" << std::endl;
+  //shared_vars.reset();
 }
 
-DataFrame test3(DataFrame df){
-  DoubleMatrix result = DoubleMatrix::from_RDataFrame(df);
-  for(std::size_t i =0 ;i < result.get_num_cols(); ++i ){
-    Rcout << result.get_col_name(i) << std::endl;
-  }
-  for(std::size_t i =0 ;i < result.get_num_rows(); ++i ){
-    Rcout << result.get_row_name(i) << std::endl;
-  }
-  return result.to_DataFrame();
+NumericMatrix cpp_mult(NumericMatrix m1, NumericMatrix m2){
+  DoubleMatrix dm1 = DoubleMatrix::from_Rmatrix(m1);
+  DoubleMatrix dm2 = DoubleMatrix::from_Rmatrix(m2);
+  return (dm1 * dm2).to_Matrix();
 }
 
-void test4(DataFrame df){
-  DoubleMatrix result = DoubleMatrix::from_RDataFrame(df);
-  for(std::size_t i =0 ;i < result.get_num_cols(); ++i ){
-    Rcout << result.get_col_name(i) << std::endl;
-  }
-  for(std::size_t i =0 ;i < result.get_num_rows(); ++i ){
-    Rcout << result.get_row_name(i) << std::endl;
-  }
-}
-
-DataFrame test5(NumericMatrix mat){
-  DoubleMatrix result = DoubleMatrix::from_Rmatrix(mat);
-  return result.to_DataFrame();
+NumericMatrix cpp_tmult(NumericMatrix m1, NumericMatrix m2){
+  DoubleMatrix dm1 = DoubleMatrix::from_Rmatrix(m1);
+  DoubleMatrix dm2 = DoubleMatrix::from_Rmatrix(m2);
+  dm1.transpose();
+  dm2.transpose();
+  return (dm1 * dm2).to_Matrix();
 }

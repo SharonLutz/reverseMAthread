@@ -118,9 +118,7 @@ stripped_down_mediate <- function(model.m, model.y, sims = 1000, treat = "treat.
       
       ymat.t <- model.matrix(terms(model.y), data=pred.data.t)
       ymat.c <- model.matrix(terms(model.y), data=pred.data.c)
-      print(dim(as.matrix(YModel[j,])))
-      print(dim(ymat.c))
-      return()
+      
       Pr1[,j] <- t(as.matrix(YModel[j,])) %*% t(ymat.t)
       Pr0[,j] <- t(as.matrix(YModel[j,])) %*% t(ymat.c)
       

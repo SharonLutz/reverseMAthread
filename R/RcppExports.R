@@ -5,8 +5,12 @@ mediate_helper <- function(env) {
     invisible(.Call(`_reverseC_mediate_helper`, env))
 }
 
-test <- function() {
-    invisible(.Call(`_reverseC_test`))
+cpp_mult <- function(m1, m2) {
+    .Call(`_reverseC_cpp_mult`, m1, m2)
+}
+
+cpp_tmult <- function(m1, m2) {
+    .Call(`_reverseC_cpp_tmult`, m1, m2)
 }
 
 derp <- function(x) {
