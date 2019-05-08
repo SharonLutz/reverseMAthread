@@ -43,4 +43,5 @@ Collate:
     'stripped_down_mediate.R'
     'thread_toy.R'
 LinkingTo: 
-    Rcpp
+    Rcpp,
+    RcppEigen

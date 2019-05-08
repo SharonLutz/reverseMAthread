@@ -5,8 +5,8 @@ mediate_helper <- function(env) {
     invisible(.Call(`_reverseC_mediate_helper`, env))
 }
 
-threaded_mediate_helper <- function(env) {
-    invisible(.Call(`_reverseC_threaded_mediate_helper`, env))
+threaded_mediate_helper <- function(env, num_threads) {
+    invisible(.Call(`_reverseC_threaded_mediate_helper`, env, num_threads))
 }
 
 cpp_mult <- function(m1, m2) {
@@ -15,6 +15,14 @@ cpp_mult <- function(m1, m2) {
 
 cpp_tmult <- function(m1, m2) {
     .Call(`_reverseC_cpp_tmult`, m1, m2)
+}
+
+getEigenValues <- function(M) {
+    .Call(`_reverseC_getEigenValues`, M)
+}
+
+eigen_mat_mult <- function(M1, M2) {
+    .Call(`_reverseC_eigen_mat_mult`, M1, M2)
 }
 
 derp <- function(x) {

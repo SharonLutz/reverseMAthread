@@ -7,7 +7,7 @@
 // [[Rcpp::plugins(cpp11)]]
 void mediate_helper(Rcpp::Environment &env);
 
-void threaded_mediate_helper(Rcpp::Environment &env);
+void threaded_mediate_helper(Rcpp::Environment &env, long long int num_threads);
 
 DoubleMatrix pred_to_model_mat(SharedLocalMediateVariables& sv, DoubleMatrix &pred_mat);
 Rcpp::NumericMatrix cpp_mult(Rcpp::NumericMatrix m1, Rcpp::NumericMatrix m2);
