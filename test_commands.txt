@@ -16,8 +16,11 @@ reverseC::mediate_helper(environment())
 reverseC::threaded_mediate_helper(environment(), 4)
 
 
-stripped_down_mediate_with_rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1")
+stripped_down_mediate_with_rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=10000)
 
+tic("test");reverseC::threaded_mediate_helper(environment(), 7);toc()
+
+tic("test");med_result=mediate(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=10000);toc()
 
 
 df = data.frame("N" = c(1.1,1.2,1.3))
