@@ -1,9 +1,8 @@
 devtools::load_all()
 
+#param = reverseC::MediateDataGenerationParameters(n=6000, nSim=1)
+
 param = reverseC::MediateDataGenerationParameters(n=1000, nSim=1)
-
-param = reverseC::MediateDataGenerationParameters(n=6000, nSim=1)
-
 data_item = reverseC::generateDataMatrix(param)[[1]]
 models = reverseC::assembleLinearModels(data_item)
 med_env = reverseC::stripped_down_mediate_with_rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=10000, return_context=T)
@@ -14,7 +13,7 @@ reverseC::export_environment(med_env)
 reverseC::mediate_helper(environment())
 
 
-reverseC::threaded_mediate_helper(environment())
+reverseC::threaded_mediate_helper(environment(), 4)
 
 
 stripped_down_mediate_with_rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1")
@@ -27,6 +26,11 @@ df["B"] = c(4,5,6)
 dft = as.data.frame(t(df))
 
 emat = mmat = matrix(c(1,2,3,4,5,6,7,8,9), nrow=3, ncol=3)
+edf = as.data.frame(emat)
+edfmat = as.matrix(edf)
+
 mmat = matrix(c(1,2,3,4,5,6,7,8,9,10,11,12), nrow=4, ncol=3)
 tmat = t(mmat)
+
+
 reverseC::cpp_mult(mmat,tmat)

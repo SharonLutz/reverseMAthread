@@ -1,37 +1,19 @@
 #include "mediate_with_cpp.hpp"
-#include "double_matrix.hpp"
 #include "shared_local_mediate_variables.hpp"
-#include "vector_math_operators.hpp"
+#include <Rcpp.h>
+#include <RcppEigen.h>
 #include <thread>
 #include <future>
 #include <deque>
 
+
 // [[Rcpp::plugins(cpp11)]]
 
-DoubleMatrix pred_to_model_mat(SharedLocalMediateVariables& sv, DoubleMatrix &pred_mat){
-  unsigned long long int nrows = pred_mat.get_num_rows();
-  unsigned long long int nterms = sv.terms.size();
-  
-  DoubleMatrix model_mat(nrows, nterms+1);
-  std::vector<std::string> col_names{"(intercept)"};
-  
-  for(std::size_t i=0;i<nterms;++i){
-    col_names.push_back(sv.terms[i]);
+void pred_to_model_mat(SharedLocalMediateVariables& sv, Eigen::MatrixXd &pred_mat, Eigen::MatrixXd &model_mat){
+  model_mat.col(0).setOnes();
+  for(std::size_t col_i=0;col_i<sv.terms.size();++col_i){
+    model_mat.col(col_i+1) = pred_mat.col(col_i);
   }
-  
-  model_mat.set_col_names(col_names);
-  
-  for(unsigned long long int row_i=0;row_i<nrows;++row_i){
-    model_mat(row_i,0) = 1.0;
-  }
-  
-  for(unsigned long long int col_i=0;col_i<nterms;++col_i){
-    std::string term_label;
-    term_label = sv.terms[col_i];
-    model_mat.assign_column(pred_mat[term_label], col_i);
-  }
-  
-  return model_mat;
 }
 
 bool compare_vect(const Rcpp::IntegerVector &v1, const Rcpp::IntegerVector &v2){
@@ -51,8 +33,8 @@ void inner_loop(
     SharedLocalMediateVariables& sv,
     std::array<int, 4>& tt,
     std::size_t j, 
-    DoubleMatrix &Pr1, 
-    DoubleMatrix &Pr0,
+    Eigen::MatrixXd &Pr1, 
+    Eigen::MatrixXd &Pr0,
     int cat_t,
     int cat_t_ctrl,
     int cat_c,
@@ -60,84 +42,40 @@ void inner_loop(
 ) {
   // Rcpp::Rcout << "inner: " << j << std::endl;
   
-  DoubleMatrix pred_data_t = sv.y_data;
+  Eigen::MatrixXd pred_data_t = sv.y_data;
+  Eigen::MatrixXd pred_data_c = sv.y_data;
   
-  DoubleMatrix pred_data_c = sv.y_data;
-  
-  // Rcpp::Rcout << "TEST0" << std::endl;
-  
-  pred_data_t.assign_column(cat_t, sv.treat);
-  pred_data_c.assign_column(cat_c, sv.treat);
-  
-  // Rcpp::Rcout << "TEST1" << std::endl;
+  pred_data_t.col(sv.treat_i).setConstant(cat_t);
+  pred_data_c.col(sv.treat_i).setConstant(cat_c);
   
   //PredictMt <- PredictM1[j,] * tt[3] + PredictM0[j,] * (1 - tt[3])
   //PredictMc <- PredictM1[j,] * tt[4] + PredictM0[j,] * (1 - tt[4])
   
-  double tt_val_2 = tt[2];
-  double tt_val_3 = tt[3];
-  
-  // Rcpp::Rcout << "sv.PredictM1(j) size: " << sv.PredictM1(j).size() << std::endl;
-  // Rcpp::Rcout << "sv.PredictM0(j) size: " << sv.PredictM0(j).size() << std::endl;
-  
-  std::vector<double> PredictM1_row_j = wrap_DoubleMatrix_column_or_row(sv.PredictM1(j));
-  std::vector<double> PredictM0_row_j = wrap_DoubleMatrix_column_or_row(sv.PredictM0(j));
-  
-  // Rcpp::Rcout << "PredictM1_row_j size: " << PredictM1_row_j.size() << std::endl;
-  // Rcpp::Rcout << "PredictM0_row_j size: " << PredictM0_row_j.size() << std::endl;
-  
-  std::vector<double> PredictMt = (PredictM1_row_j * tt_val_2) + (PredictM0_row_j * (1-tt_val_2));
-  std::vector<double> PredictMc = (PredictM1_row_j * tt_val_3) + (PredictM0_row_j * (1-tt_val_3));
-  //NumericVector PredictMt = (sv.PredictM1(j,_) * tt[2]) + (sv.PredictM0(j,_) * (1 - tt[2]));
-  //NumericVector PredictMc = (sv.PredictM1(j,_) * tt[3]) + (sv.PredictM0(j,_) * (1 - tt[3]));
-  
-  // Rcpp::Rcout << "PredictMt size: " << PredictMt.size() << std::endl;
-  // Rcpp::Rcout << "PredictMc size: " << PredictMc.size() << std::endl;
-  
-  //Rcpp::Rcout << "TEST2" << std::endl;
-  
   //pred.data.t[,mediator] <- PredictMt
   //pred.data.c[,mediator] <- PredictMc
   
-  pred_data_t.assign_column(PredictMt, sv.mediator);
-  pred_data_c.assign_column(PredictMc, sv.mediator);
+  pred_data_t.col(sv.mediator_i) = (sv.PredictM1.row(j) * tt[2]) + (sv.PredictM0.row(j) * (1-tt[2]));
+  pred_data_c.col(sv.mediator_i) = (sv.PredictM1.row(j) * tt[3]) + (sv.PredictM0.row(j) * (1-tt[3]));
   
-  //Rcpp::Rcout << "TEST3" << std::endl;
+  Eigen::MatrixXd ymat_t(pred_data_t.rows(), sv.terms.size() + 1);
+  Eigen::MatrixXd ymat_c(pred_data_c.rows(), sv.terms.size() + 1);
   
-  DoubleMatrix ymat_t = pred_to_model_mat(sv, pred_data_t);
-  DoubleMatrix ymat_c = pred_to_model_mat(sv, pred_data_c);
+  pred_to_model_mat(sv, pred_data_t, ymat_t);
+  pred_to_model_mat(sv, pred_data_c, ymat_c);
   
-  //Rcpp::Rcout << "TEST4" << std::endl;
+  //Pr1[,j] <- t(as.matrix(YModel[j,])) %*% t(ymat.t)
+  //Pr0[,j] <- t(as.matrix(YModel[j,])) %*% t(ymat.c)
+  Pr1.col(j) = (sv.YModel.row(j) * ymat_t.transpose()).row(0);
+  Pr0.col(j) = (sv.YModel.row(j) * ymat_c.transpose()).row(0);
   
-  std::vector<double> YModel_row_j =  wrap_DoubleMatrix_column_or_row(sv.YModel(j));
-  
-  DoubleMatrix YModel_j_as_matrix = DoubleMatrix::from_vector(YModel_row_j);
-  
-  //Rcpp::Rcout << "TEST5" << std::endl;
-  
-  YModel_j_as_matrix.transpose();
-  ymat_t.transpose();
-  ymat_c.transpose();
-  
-  //Rcpp::Rcout << "TEST6" << std::endl;
-  
-  DoubleMatrix mmult1 = YModel_j_as_matrix * ymat_t;
-  DoubleMatrix mmult2 = YModel_j_as_matrix * ymat_t;
-  
-  //Rcpp::Rcout << "TEST7" << std::endl;
-  
-  // Rcpp::Rcout << mmult1.get_num_rows() << ',' << mmult1.get_num_cols() << std::endl;
-  // Rcpp::Rcout << mmult2.get_num_rows() << ',' << mmult2.get_num_cols() << std::endl;
-  
-  //Pr1(_,j) = cpp_matrix_mult_of_transposed(YModel_j_as_matrix,ymat_t);
-  //Pr0(_,j) = cpp_matrix_mult_of_transposed(YModel_j_as_matrix,ymat_c);
+  // Rcpp::Rcout << "TEST3" << std::endl;
 }
 
 void outer_loop(SharedLocalMediateVariables& sv, std::size_t e) {
   // Rcpp::Rcout<< "outer_loop begin: " << e << std::endl;
   std::array<int, 4>& tt = sv.tt_switch[e];
-  DoubleMatrix Pr1(sv.n, sv.sims);
-  DoubleMatrix Pr0(sv.n, sv.sims);
+  Eigen::MatrixXd Pr1(sv.n, sv.sims);
+  Eigen::MatrixXd Pr0(sv.n, sv.sims);
   int cat_t = tt[0] ? sv.cat_1 : sv.cat_0;
   int cat_t_ctrl = tt[1] ? sv.cat_1 : sv.cat_0;
   int cat_c = tt[0] ? sv.cat_0 : sv.cat_1;
@@ -164,10 +102,10 @@ void mediate_helper(Rcpp::Environment &env){
   }
   //*/
   //*
-  env["et1"] = shared_vars.effects_tmp[0].to_Matrix();
-  env["et2"] = shared_vars.effects_tmp[1].to_Matrix();
-  env["et3"] = shared_vars.effects_tmp[2].to_Matrix();
-  env["et4"] = shared_vars.effects_tmp[3].to_Matrix();
+  env["et1"] = shared_vars.effects_tmp[0];
+  env["et2"] = shared_vars.effects_tmp[1];
+  env["et3"] = shared_vars.effects_tmp[2];
+  env["et4"] = shared_vars.effects_tmp[3];
   //*/
   // Rcpp::Rcout<< "mediate_helper end" << std::endl;
   //shared_vars.reset();
@@ -242,13 +180,13 @@ void outer_loop_with_threads(SharedLocalMediateVariables& sv, std::size_t e, lon
   std::vector<std::promise<bool>> promises(num_threads);
   std::size_t next_index_value = 0;
   std::mutex remaining_indexes_mutex;
-  
+  std::size_t num_sims = sv.sims;
   
   
   // Rcpp::Rcout<< "outer_loop begin: " << e << std::endl;
   std::array<int, 4>& tt = sv.tt_switch[e];
-  DoubleMatrix Pr1(sv.n, sv.sims);
-  DoubleMatrix Pr0(sv.n, sv.sims);
+  Eigen::MatrixXd Pr1(sv.n, sv.sims);
+  Eigen::MatrixXd Pr0(sv.n, sv.sims);
   int cat_t = tt[0] ? sv.cat_1 : sv.cat_0;
   int cat_t_ctrl = tt[1] ? sv.cat_1 : sv.cat_0;
   int cat_c = tt[0] ? sv.cat_0 : sv.cat_1;
@@ -256,10 +194,10 @@ void outer_loop_with_threads(SharedLocalMediateVariables& sv, std::size_t e, lon
   
   auto inner_loop_thread = [&](std::size_t thread_index){
     std::size_t j;
-    while(next_index_value < sv.sims){
+    while(next_index_value < num_sims){
       {
         std::lock_guard<std::mutex> lg(remaining_indexes_mutex);
-        if(next_index_value >= sv.sims){
+        if(next_index_value >= num_sims){
           break;
         }
         j=next_index_value++;
@@ -275,12 +213,12 @@ void outer_loop_with_threads(SharedLocalMediateVariables& sv, std::size_t e, lon
   
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   
-  for(std::size_t i=0;i<num_threads;++i){
+  for(long long int i=0;i<num_threads;++i){
     auto f = promises[i].get_future();
     f.wait();
   }
   
-  for(std::size_t i=0;i<num_threads;++i){
+  for(long long int i=0;i<num_threads;++i){
     threads[i].join();
   }
   
@@ -310,24 +248,10 @@ void threaded_mediate_helper(Rcpp::Environment &env, long long int num_threads){
     break;
   }
   
-  env["et1"] = shared_vars.effects_tmp[0].to_Matrix();
-  env["et2"] = shared_vars.effects_tmp[1].to_Matrix();
-  env["et3"] = shared_vars.effects_tmp[2].to_Matrix();
-  env["et4"] = shared_vars.effects_tmp[3].to_Matrix();
+  env["et1"] = shared_vars.effects_tmp[0];
+  env["et2"] = shared_vars.effects_tmp[1];
+  env["et3"] = shared_vars.effects_tmp[2];
+  env["et4"] = shared_vars.effects_tmp[3];
   
   
-}
-
-Rcpp::NumericMatrix cpp_mult(Rcpp::NumericMatrix m1, Rcpp::NumericMatrix m2){
-  DoubleMatrix dm1 = DoubleMatrix::from_Rmatrix(m1);
-  DoubleMatrix dm2 = DoubleMatrix::from_Rmatrix(m2);
-  return (dm1 * dm2).to_Matrix();
-}
-
-Rcpp::NumericMatrix cpp_tmult(Rcpp::NumericMatrix m1, Rcpp::NumericMatrix m2){
-  DoubleMatrix dm1 = DoubleMatrix::from_Rmatrix(m1);
-  DoubleMatrix dm2 = DoubleMatrix::from_Rmatrix(m2);
-  dm1.transpose();
-  dm2.transpose();
-  return (dm1 * dm2).to_Matrix();
 }

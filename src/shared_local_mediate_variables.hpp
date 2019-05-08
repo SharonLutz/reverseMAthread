@@ -1,7 +1,7 @@
 #ifndef STRUCT_SHAREDLOCALMEDIATEVARIABLES_HPP
 #define STRUCT_SHAREDLOCALMEDIATEVARIABLES_HPP
 #include <Rcpp.h>
-#include "double_matrix.hpp"
+#include <RcppEigen.h>
 #include <mutex>
 
 // [[Rcpp::plugins(cpp11)]]
@@ -13,14 +13,16 @@ struct SharedLocalMediateVariables {
   int cat_1;
   std::string treat;
   std::string mediator;
+  Eigen::Index treat_i;
+  Eigen::Index mediator_i;
   std::vector<std::string> terms;
   std::array< std::array<int, 4>, 4 > tt_switch;
-  DoubleMatrix PredictM0;
-  DoubleMatrix PredictM1;
-  DoubleMatrix YModel;
-  DoubleMatrix y_data;
+  Eigen::MatrixXd PredictM0;
+  Eigen::MatrixXd PredictM1;
+  Eigen::MatrixXd YModel;
+  Eigen::MatrixXd y_data;
   std::mutex effects_tmp_mutex;
-  std::vector<DoubleMatrix>effects_tmp;
+  std::vector<Eigen::MatrixXd> effects_tmp;
   SharedLocalMediateVariables();
   void initialize_from_environment(Rcpp::Environment & env);
 };
