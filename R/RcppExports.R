@@ -5,15 +5,15 @@ mediate_helper <- function(env) {
     invisible(.Call(`_reverseC_mediate_helper`, env))
 }
 
+mediate_helper_variable_exporter <- function(env) {
+    invisible(.Call(`_reverseC_mediate_helper_variable_exporter`, env))
+}
+
 threaded_mediate_helper <- function(env, num_threads) {
     invisible(.Call(`_reverseC_threaded_mediate_helper`, env, num_threads))
 }
 
 test <- function(env) {
     invisible(.Call(`_reverseC_test`, env))
-}
-
-derp <- function(x) {
-    .Call(`_reverseC_derp`, x)
 }
 

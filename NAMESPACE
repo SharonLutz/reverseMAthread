@@ -2,7 +2,6 @@
 
 export(reverseMAdata)
 export(reverseMAsim)
-export(reverseMAsimMultiProcess)
 export(reverseMRdata)
 export(reverseMRsim)
 import(RcppEigen)

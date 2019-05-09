@@ -1,11 +1,36 @@
+Rcpp::compileAttributes();devtools::document();devtools::unload();devtools::load_all();
+
 devtools::load_all()
 
 #param = reverseC::MediateDataGenerationParameters(n=6000, nSim=1)
 
-param = reverseC::MediateDataGenerationParameters(n=1000, nSim=1)
+set.seed(1)
+param = reverseC::MediateDataGenerationParameters(n=100, nSim=1)
 data_item = reverseC::generateDataMatrix(param)[[1]]
 models = reverseC::assembleLinearModels(data_item)
+
+set.seed(1)
+vanilla_med_env = reverseC::test.mediate.vanilla(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=100, return_context=T, export_loop_vars=T)
+vanilla_loop_env = reverseC::collect_vanillaR_loop_exports()
+
+set.seed(1)
+rcpp_med_env_n1 = reverseC::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=100, return_context=T, export_loop_vars=T)
+rcpp_loop_env = reverseC::collect_rcpp_loop_exports()
+mediation.test.compare()
+
+set.seed(1)
+rcpp_med_env_n2 = reverseC::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=100, return_context=T, num_cores=2)
+
+set.seed(1)
+rcpp_med_env_n4 = reverseC::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=100, return_context=T, num_cores=4)
+
+set.seed(1)
+rcpp_med_env_n7 = reverseC::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=100, return_context=T, num_cores=7)
+
 med_env = reverseC::stripped_down_mediate_with_rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=10000, return_context=T)
+
+med_env = reverseC::stripped_down_mediate_with_rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=1000, return_context=T)
+
 reverseC::export_environment(med_env)
 
 

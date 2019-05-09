@@ -16,6 +16,16 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// mediate_helper_variable_exporter
+void mediate_helper_variable_exporter(Rcpp::Environment& env);
+RcppExport SEXP _reverseC_mediate_helper_variable_exporter(SEXP envSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::Environment& >::type env(envSEXP);
+    mediate_helper_variable_exporter(env);
+    return R_NilValue;
+END_RCPP
+}
 // threaded_mediate_helper
 void threaded_mediate_helper(Rcpp::Environment& env, long long int num_threads);
 RcppExport SEXP _reverseC_threaded_mediate_helper(SEXP envSEXP, SEXP num_threadsSEXP) {
@@ -37,23 +47,12 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// derp
-NumericVector derp(NumericVector x);
-RcppExport SEXP _reverseC_derp(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(derp(x));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_reverseC_mediate_helper", (DL_FUNC) &_reverseC_mediate_helper, 1},
+    {"_reverseC_mediate_helper_variable_exporter", (DL_FUNC) &_reverseC_mediate_helper_variable_exporter, 1},
     {"_reverseC_threaded_mediate_helper", (DL_FUNC) &_reverseC_threaded_mediate_helper, 2},
     {"_reverseC_test", (DL_FUNC) &_reverseC_test, 1},
-    {"_reverseC_derp", (DL_FUNC) &_reverseC_derp, 1},
     {NULL, NULL, 0}
 };
 

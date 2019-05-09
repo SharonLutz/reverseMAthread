@@ -1,8 +1,10 @@
-#' @include pval_func.R
 #our calls always this style: mediate(model.m, model.y, treat= "X", mediator="M", sims = nSimImai)
 #both models are lm with no special types / conditions
-stripped_down_mediate_with_rcpp <- function(model.m, model.y, sims = 1000, treat = "treat.name", mediator = "med.name",
-                                  conf.level = .95, control.value = 0, treat.value = 1, return_context=F){
+mediate_with_rcpp <- 
+  function(model.m, model.y, sims = 1000, treat = "treat.name", mediator = "med.name",
+           conf.level = .95, control.value = 0, treat.value = 1){
+  
+  num_threads = getOption("mediate.threads", default = 1)
   
   # Model frames for M and Y models
   m.data <- model.frame(model.m)  # Call.M$data
@@ -89,10 +91,12 @@ stripped_down_mediate_with_rcpp <- function(model.m, model.y, sims = 1000, treat
   #####################################
   ##  Outcome Predictions
   #####################################
-  if(return_context){
-    return(environment())
+  
+  if(num_threads > 1){
+    threaded_mediate_helper(environment(), num_threads)
+  } else {
+    mediate_helper(environment())
   }
-  mediate_helper(environment())
   
   delta.1 <- t(as.matrix(apply(et1, 2, weighted.mean, w=weights)))
   delta.0 <- t(as.matrix(apply(et2, 2, weighted.mean, w=weights)))
@@ -136,16 +140,16 @@ stripped_down_mediate_with_rcpp <- function(model.m, model.y, sims = 1000, treat
   n.avg.ci <- quantile(nu.avg, c(low,high), na.rm=TRUE)
   
   # p-values
-  d0.p <- pval(delta.0, d0)
-  d1.p <- pval(delta.1, d1)
-  d.avg.p <- pval(delta.avg, d.avg)
-  z0.p <- pval(zeta.0, z0)
-  z1.p <- pval(zeta.1, z1)
-  z.avg.p <- pval(zeta.avg, z.avg)        
-  n0.p <- pval(nu.0, n0)
-  n1.p <- pval(nu.1, n1)
-  n.avg.p <- pval(nu.avg, n.avg)
-  tau.p <- pval(tau, tau.coef)
+  d0.p <- mediation:::pval(delta.0, d0)
+  d1.p <- mediation:::pval(delta.1, d1)
+  d.avg.p <- mediation:::pval(delta.avg, d.avg)
+  z0.p <- mediation:::pval(zeta.0, z0)
+  z1.p <- mediation:::pval(zeta.1, z1)
+  z.avg.p <- mediation:::pval(zeta.avg, z.avg)        
+  n0.p <- mediation:::pval(nu.0, n0)
+  n1.p <- mediation:::pval(nu.1, n1)
+  n.avg.p <- mediation:::pval(nu.avg, n.avg)
+  tau.p <- mediation:::pval(tau, tau.coef)
   
   # Detect whether models include T-M interaction
   INT <- paste(treat,mediator,sep=":") %in% attr(terms(model.y),"term.labels") |
@@ -154,9 +158,3 @@ stripped_down_mediate_with_rcpp <- function(model.m, model.y, sims = 1000, treat
   return(SimpleMediateResult(direct_p = z.avg.p, indirect_p=d.avg.p))
 }
 
-export_environment <- function(env){
-  glob_env = globalenv()
-  for(item in names(env)){
-    glob_env[[item]] = env[[item]]
-  }
-}

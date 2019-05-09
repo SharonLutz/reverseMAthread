@@ -1,10 +1,15 @@
+#pragma once
+
 #ifndef STRUCT_SHAREDLOCALMEDIATEVARIABLES_HPP
 #define STRUCT_SHAREDLOCALMEDIATEVARIABLES_HPP
+#ifndef EIGEN_DONT_PARALLELIZE
+#define EIGEN_DONT_PARALLELIZE
+#endif
+// [[Rcpp::plugins(cpp11)]]
+// [[Rcpp::depends(RcppEigen)]]
 #include <Rcpp.h>
 #include <RcppEigen.h>
-#include <mutex>
 
-// [[Rcpp::plugins(cpp11)]]
 
 struct SharedLocalMediateVariables {
   int n;
@@ -21,9 +26,14 @@ struct SharedLocalMediateVariables {
   Eigen::MatrixXd PredictM1;
   Eigen::MatrixXd YModel;
   Eigen::MatrixXd y_data;
-  std::mutex effects_tmp_mutex;
-  std::vector<Eigen::MatrixXd> effects_tmp;
+  
+  Eigen::MatrixXd et1;
+  Eigen::MatrixXd et2;
+  Eigen::MatrixXd et3;
+  Eigen::MatrixXd et4;
   SharedLocalMediateVariables();
   void initialize_from_environment(Rcpp::Environment & env);
+  void store_result_diff(Eigen::MatrixXd Pr1, Eigen::MatrixXd Pr0, std::size_t e);
+  void export_results(Rcpp::Environment & env);
 };
 #endif //STRUCT_SHAREDLOCALMEDIATEVARIABLES_HPP

@@ -2,6 +2,7 @@
 #' @title MediateDataGenerationParameters
 #' @description Convenience class for use with other methods and classes to generate mediation data for use with parallel processing.
 #' @author Michael Gooch
+#' @name MediateDataGenerationParameters
 #' @slot n is the sample size.
 #' @slot pX is the minor allele frequency
 #' @slot gamma0 is the intercept for M
@@ -71,6 +72,7 @@ methods::setClass("MediateDataGenerationParameters",
 #' @title MediateModelVariables
 #' @description convenience container for vectors of simulated data to be used with other methods and classes to generate linear models for use with mediation analysis in parallel processes
 #' @author Michael Gooch
+#' @name MediateModelVariables
 #' @slot X is the exposure
 #' @slot M is the mediator
 #' @slot Y is the outcome
@@ -93,6 +95,7 @@ methods::setClass("MediateModelVariables",
 #' @title MediateLinearModels
 #' @description convenience container for 4 linear models, 2 pairs, intended for forward and reverse mediation analysis
 #' @author Michael Gooch
+#' @name MediateLinearModels
 #' @slot med.fit linear model for the mediator
 #' @slot out.fit linear model for the outcome
 #' @slot med.fit.r linear model for the mediator with M and Y swapped
@@ -115,6 +118,7 @@ methods::setClass("MediateLinearModels",
 #' @title MediationProbValues
 #' @description Convenience container for the result of a forward and reverse pair of mediation analysis results
 #' @author Michael Gooch
+#' @name MediationProbValues
 #' @slot pval_direct direct probability from forward mediation analysis
 #' @slot pval_indirect indirect probability from forward mediation analysis
 #' @slot pval_direct_r direct probability from reverse mediation analysis

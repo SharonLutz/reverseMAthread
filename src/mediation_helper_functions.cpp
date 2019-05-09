@@ -1,28 +1,38 @@
-#include <vector>
-#include <array>
-#include <map>
-#include <cstdint>
-#include <sstream>
-#include <memory>
+// [[Rcpp::plugins(cpp11)]]
+// [[Rcpp::depends(RcppEigen)]]
+#ifndef EIGEN_DONT_PARALLELIZE
+#define EIGEN_DONT_PARALLELIZE
+#endif
 #include <Rcpp.h>
 #include <RcppEigen.h>
-
-// Enable C++11 via this plugin (Rcpp 0.10.3 or later)
-// [[Rcpp::plugins(cpp11)]]
-
-// This is a simple example of exporting a C++ function to R. You can
-// source this function into an R session using the Rcpp::sourceCpp 
-// function (or via the Source button on the editor toolbar). Learn
-// more about Rcpp at:
-//
-//   http://www.rcpp.org/
-//   http://adv-r.had.co.nz/Rcpp.html
-//   http://gallery.rcpp.org/
-//
+#include  "mediation_helper.hpp"
 
 // [[Rcpp::export]]
-void mediate_helper(Rcpp::Environment &env);
+void mediate_helper(Rcpp::Environment &env){
+  // Eigen::setNbThreads(1);
+  MediationHelper h(env);
+  h();
+  // Eigen::setNbThreads(0);
+}
 
 // [[Rcpp::export]]
-void threaded_mediate_helper(Rcpp::Environment &env, long long int num_threads);
+void mediate_helper_variable_exporter(Rcpp::Environment &env){
+  // Eigen::setNbThreads(1);
+  MediationHelper h(env, true);
+  h();
+  // Eigen::setNbThreads(0);
+}
+
+// [[Rcpp::export]]
+void threaded_mediate_helper(Rcpp::Environment &env, long long int num_threads){
+  // Eigen::setNbThreads(1);
+  if(num_threads > 1){
+    Eigen::initParallel();
+    MediationHelper h(env, num_threads);
+    h();
+  } else {
+    mediate_helper(env);
+  }
+  // Eigen::setNbThreads(0);
+}
 

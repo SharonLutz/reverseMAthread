@@ -21,27 +21,28 @@ Imports:
     parallel,
     tictoc,
     Rcpp,
-    mvtnorm
+    mvtnorm,
+    pbapply
 URL: https://github.com/SharonLutz/reverseC
 BugReports: https://github.com/SharonLutz/reverseC/issues
 RoxygenNote: 6.1.1
 Collate: 
     'RcppExports.R'
     'mediate_s4_classes.R'
-    'pval_func.R'
     'mediate_with_rcpp.R'
+    'multi_process_mediate_impl.R'
     'multi_process_mediate.R'
     'reverseC-internal.R'
     'reverseC-package.R'
     'reverseC.R'
     'reverseMAdata.R'
+    'reverseMAsim_impl.R'
     'reverseMAsim.R'
-    'reverseMAsim_multi_process.R'
     'reverseMRdata.R'
     'reverseMRsim.R'
     'simple_mediate_result.R'
     'stripped_down_mediate.R'
-    'thread_toy.R'
+    'test_mediation.R'
 LinkingTo: 
     Rcpp,
     RcppEigen
