@@ -49,9 +49,9 @@ plot.name = "reverseMRplot.pdf", alpha_level = 0.05, SEED = 1001)
 For the example, we get corresponding plot. In the plot below, the methods ending in NR have the true outcome as the outcome where as the methods ending in R have the true outcome reversed with the mediator. When the mediator and outcome are reversed, the Egger regression and the Median Weighted Approach have an inflated type 1 error rate. While the IVW approach does not have an inflated type 1 error rate, there is very little difference in the IVW approach if the mediator and outcome are reversed, which implies that this approach cannot easily distinguish the causal relationship between the mediator and outcome.
 
 
-<img src="https://github.com/SharonLutz/reverseC/blob/master/reverseMRplot.png" width="500">
+<img src="reverseMRplot.png" width="500">
 
-<img src="https://github.com/SharonLutz/reverseC/blob/master/reverseDirectionplot.png" width="500">
+<img src="reverseDirectionplot.png" width="500">
 
 ## References
 MR.Egger is the Egger Regression approach to MR.<br/>
