@@ -21,7 +21,8 @@ Imports:
     parallel,
     Rcpp,
     mvtnorm,
-    pbapply
+    pbapply,
+    TwoSampleMR
 URL: https://github.com/SharonLutz/reverseC
 BugReports: https://github.com/SharonLutz/reverseC/issues
 RoxygenNote: 6.1.1

@@ -121,11 +121,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Annie Thwing \email{annie.thwing@ucdenver.edu}
+\strong{Maintainer}: Sharon Lutz \email{smlutz@hsph.harvard.edu}
 
 Authors:
 \itemize{
-  \item Sharon Lutz
+  \item Annie Thwing \email{annie.thwing@ucdenver.edu}
   \item Michael Gooch \email{goochmi@gmail.com} [contributor]
 }
 

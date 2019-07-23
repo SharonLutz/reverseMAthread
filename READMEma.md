@@ -13,6 +13,8 @@ Requirements:
 ```
 install.packages("devtools") # devtools must be installed first
 
+devtools::install_github("MRCIEU/TwoSampleMR") # this is a dependency not present in R CRAN, it should be installed before reverseC
+
 devtools::install_github("SharonLutz/reverseC")
 ```
 The install process will involve compiling source code. If you are on MacOSX, this may involve the clang compiler issuing warnings about unknown pragmas similar to the text below. Do not be alarmed if you see these. If there is actually an error, it will be present among the last several messages issued by the compiler.
