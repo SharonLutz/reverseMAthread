@@ -1,5 +1,4 @@
 #' @include mediate_s4_classes.R multi_process_mediate.R
-#' @importFrom tictoc tic toc
 
 #' @title reverseMAsim.SingleProcess
 #' @description A function to similate the performance of the mediate function from the mediation package in scenarios of reverse causality. Leverages threading and Rcpp with Eigen for faster computation speed.
@@ -90,7 +89,6 @@ reverseMAsim.SingleProcess <-
         pval_direct_r=0.0
         pval_indirect_r=0.0
         
-        # tic("mediation")
         if(!use_cpp){
           med.out <- mediation::mediate(med.fit,out.fit,treat = "X",mediator = "M",sims = nSimImai)
           med.outR <- mediation::mediate(med.fitR,out.fitR,treat = "X",mediator = "M2",sims = nSimImai)
@@ -110,7 +108,7 @@ reverseMAsim.SingleProcess <-
           pval_direct_r <- med.outR@direct_p
           pval_indirect_r <- med.outR@indirect_p
         }
-        # toc()
+        
         
         # Add to the matrix
         if(pval_direct<alpha_level){mat_results[bM.ind,"DirectNR"] <- mat_results[bM.ind,"DirectNR"]+1 }
@@ -125,7 +123,7 @@ reverseMAsim.SingleProcess <-
       mat_total <- mat_total+mat_results
       pbapply::setTimerProgressBar(pb, value=i)
     } # End of nSim
-    # toc()
+    
     pbapply::closepb(pb)
     mat_total <- mat_total/nSim
     
@@ -209,9 +207,9 @@ reverseMAsim.MultiProcess <-
     #generate the data needed to make linear models.
     data_matrix = generateDataMatrix(med_vars, SEED)
     # cat("running mediation on models")
-    # tic("mediation")
+    
     result.matrix = mediate_parallel(data_matrix, nSimImai)
-    # toc()
+    
     rm(data_matrix)
     
     # print("processing results")

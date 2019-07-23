@@ -4,9 +4,13 @@ The reverseMRsim function in the reverseC R package examines the performance of 
 
 ## Installation
 ```
+you need R v3.4 or higher
+
+You will need the proper compiling tools for your platform.
+For Windows (Rtools installer):  https://cran.r-project.org/bin/windows/Rtools/
+For MacOSX (clang and gfortran): https://cran.r-project.org/bin/macosx/tools/
+
 install.packages("devtools") # devtools must be installed first
-install.packages("mediation")
-install.packages("MendelianRandomization") #you need R v3.4 or higher
 
 devtools::install_github("SharonLutz/reverseC")
 ```
