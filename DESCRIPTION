@@ -6,8 +6,8 @@ Date: 2018-05-14
 Encoding: UTF-8
 SystemRequirements: C++11
 Authors@R: c(
-    person("Annie", "Thwing", email="annie.thwing@ucdenver.edu", role=c("cre","aut")),
-    person("Sharon", "Lutz", role=c("aut")),
+    person("Annie", "Thwing", email="annie.thwing@ucdenver.edu", role=c("aut")),
+    person("Sharon", "Lutz", email="smlutz@hsph.harvard.edu", role=c("cre","aut")),
     person("Michael", "Gooch", email="goochmi@gmail.com", role=c("ctb","aut"))
     )
 Description: This package contains methods to run mediation analysis and MR with reverse causality. It contains functions to simulate the performance of mediation analysis and three MR methods (Egger regression, IVW and median) and functions which provide estimates and p-values of direct and indirect effects given a dataset.
