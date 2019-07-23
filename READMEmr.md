@@ -3,13 +3,13 @@
 The reverseMRsim function in the reverseC R package examines the performance of Mendelian Randomization (MR) methods in the presence of reverse causality. Through simulation studies, this R function examines the type 1 error rate and power for 3 popular MR methods when the role of the intermediate phenotype and outcome were correctly specified and when they were reversed (i.e. reverse causality). 
 
 ## Installation
+Requirements:
+* R v3.4 or higher
+* You will need the proper compiling tools for your platform.
+..* For Windows (Rtools installer):  https://cran.r-project.org/bin/windows/Rtools/
+..* For MacOSX (clang and gfortran): https://cran.r-project.org/bin/macosx/tools/
+
 ```
-you need R v3.4 or higher
-
-You will need the proper compiling tools for your platform.
-For Windows (Rtools installer):  https://cran.r-project.org/bin/windows/Rtools/
-For MacOSX (clang and gfortran): https://cran.r-project.org/bin/macosx/tools/
-
 install.packages("devtools") # devtools must be installed first
 
 devtools::install_github("SharonLutz/reverseC")
@@ -49,7 +49,7 @@ plot.name = "reverseMRplot.pdf", alpha_level = 0.05, SEED = 1001)
 For the example, we get corresponding plot. In the plot below, the methods ending in NR have the true outcome as the outcome where as the methods ending in R have the true outcome reversed with the mediator. When the mediator and outcome are reversed, the Egger regression and the Median Weighted Approach have an inflated type 1 error rate. While the IVW approach does not have an inflated type 1 error rate, there is very little difference in the IVW approach if the mediator and outcome are reversed, which implies that this approach cannot easily distinguish the causal relationship between the mediator and outcome.
 
 
-<img src="reverseMRplot.png" width="500"><br>
+<img src="reverseMRplot.png" width="500">
 
 <img src="reverseDirectionplot.png" width="500">
 
