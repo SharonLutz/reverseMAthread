@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <atomic>
 #include <mutex>
+#include <vector>
 
 class OuterLoopVars {
 public:

@@ -10,6 +10,9 @@
 #include <Rcpp.h>
 #include <RcppEigen.h>
 
+#include <string>
+#include <array>
+#include <vector>
 
 struct SharedLocalMediateVariables {
   int n;
