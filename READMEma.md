@@ -62,15 +62,15 @@ betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 500, nSimImai = 500, SEED = 1, plot.p
 plot.name = "reverseMAplotBoth.pdf", alpha_level = 0.05, use_cpp=T, use_multi_processing=T, num_jobs=4)
 ```
 
-## Important Caveats for the Faster Processing Strategies:
-```
+### Important Caveats for the Faster Processing Strategies:
+
 It is advisable that you tailor your num_jobs variable to be the # of your CPU cores - 1, at the maximum, to leave 1 core free to handle the original calling R process and any background OS processes. If you use too many procesess or threads, your system will become slow and relatively unresponsive and may lock up until the procssing completes.
 
 The Multiprocessing strategies will use significantly more RAM, as they will store approximately the same amount of data per process that the vanilla approaches and Rcpp with Eigen and threading approach will store. If you swamp out your system RAM, paging will slow your system to a crawl, and may require a system restart to regain control.
 
 If you force-stop an R terminal or R process that has already begun a multi-processing task, it may not be able to close all the child processes before it terminates. They will have to be stopped/killed before they stop consuming CPU and Memory and release the system resources.
 
-```
+
 
 ## Output
 
