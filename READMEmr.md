@@ -51,6 +51,8 @@ For the example, we get corresponding plot. In the plot below, the methods endin
 
 <img src="https://github.com/SharonLutz/reverseC/blob/master/reverseMRplot.png" width="500">
 
+<img src="https://github.com/SharonLutz/reverseC/blob/master/reverseDirectionplot.png" width="500">
+
 ## References
 MR.Egger is the Egger Regression approach to MR.<br/>
 ```
