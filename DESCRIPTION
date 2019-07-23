@@ -34,6 +34,7 @@ Collate:
     'reverseC-internal.R'
     'reverseC-package.R'
     'reverseC.R'
+    'reverseDirection.R'
     'reverseMAdata.R'
     'reverseMAsim_impl.R'
     'reverseMAsim.R'
