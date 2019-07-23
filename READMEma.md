@@ -35,13 +35,12 @@ plot.name = "reverseMAplotBoth.pdf", alpha_level = 0.05)
 ```
 
 ## Speeding things up with optional parameters:
-```
-MultiProcessing And/Or Use of Threading and Eigen via C++
+# MultiProcessing And/Or Use of Threading and Eigen via C++
 the reverseMAsim command accepts the following parameters:
-use_multi_processing, a boolean (T, F, True, or False), which turns on the multi-processing feature
-use_cpp, a boolean(T, F, True, or False), which activates the use of Rcpp RcppEigen, and threading if multiprocessing is not turned on as well.
-num_jobs, an integer specifying the number of processes or threads you wish to use.
-
+* use_multi_processing, a boolean (T, F, True, or False), which turns on the multi-processing feature
+* use_cpp, a boolean(T, F, True, or False), which activates the use of Rcpp RcppEigen, and threading if multiprocessing is not turned on as well.
+* num_jobs, an integer specifying the number of processes or threads you wish to use.
+```
 Example Using Rcpp with Eigen and 5 threads:
 
 reverseMAsim(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0, 
