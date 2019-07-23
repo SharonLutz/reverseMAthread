@@ -4,13 +4,13 @@
 These functions examines the performance of mediation analysis methods in the presence of reverse causality.
 
 ## Installation
+Requirements:
+* R v3.4 or higher
+* You will need the proper compiling tools for your platform.
+  * For Windows (Rtools installer): https://cran.r-project.org/bin/windows/Rtools/
+  * For MacOSX (clang and gfortran): https://cran.r-project.org/bin/macosx/tools/
+
 ```
-you need R v3.4 or higher
-
-You will need the proper compiling tools for your platform.
-For Windows (Rtools installer):  https://cran.r-project.org/bin/windows/Rtools/
-For MacOSX (clang and gfortran): https://cran.r-project.org/bin/macosx/tools/
-
 install.packages("devtools") # devtools must be installed first
 
 devtools::install_github("SharonLutz/reverseC")
