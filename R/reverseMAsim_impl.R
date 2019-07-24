@@ -99,8 +99,8 @@ reverseMAsim.SingleProcess <-
           pval_direct_r <- summary(med.outR)$z.avg.p
           pval_indirect_r <- summary(med.outR)$d.avg.p
         } else {
-          med.out <- reverseC::mediate_with_rcpp (med.fit,out.fit,treat = "X",mediator = "M",sims = nSimImai)
-          med.outR <- reverseC::mediate_with_rcpp(med.fitR,out.fitR,treat = "X",mediator = "M2",sims = nSimImai)
+          med.out <- mediate_with_rcpp (med.fit,out.fit,treat = "X",mediator = "M",sims = nSimImai)
+          med.outR <- mediate_with_rcpp(med.fitR,out.fitR,treat = "X",mediator = "M2",sims = nSimImai)
           # Get the direct and indirect effects
           pval_direct <- med.out@direct_p
           pval_indirect <- med.out@indirect_p
