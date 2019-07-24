@@ -96,7 +96,7 @@ mediate_parallel.unix <- function(list_of_job_args, nSimImai=1000, use_cpp=F, nu
 
 mediate_parallel.non_unix <-function(list_of_job_args, nSimImai=1000, use_cpp=F, num_jobs=getOption("mediate.jobs", parallel::detectCores() - 1)) {
   options(cl.cores = num_jobs)
-  setDefaultClusterOptions(type="SOCK")
+  snow::setDefaultClusterOptions(type="SOCK")
   this.cluster <- snow::makeCluster(num_jobs)
   on.exit(snow::stopCluster(this.cluster))
   #make sure reverseC is loaded on the nodes
