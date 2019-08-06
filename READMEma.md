@@ -15,7 +15,12 @@ install.packages("devtools") # devtools must be installed first
 
 devtools::install_github("MRCIEU/TwoSampleMR") # this is a dependency not present in R CRAN, it should be installed before reverseC
 
-devtools::install_github("kotoroshinoto/reverseC",quiet=T)
+# these will fail to install when already loaded, and install_github will sometimes 
+# load these as part of its activity, and will then try to install them if they need 
+# an update for one of the package dependencies
+install.packages(c("Rcpp","RcppEigen", "curl"), quiet=T) 
+
+devtools::install_github("SharonLutz/reverseC",quiet=T)
 ```
 The install process will involve compiling source code. If you are on MacOSX, this may involve the clang compiler issuing warnings about unknown pragmas similar to the text below. Do not be alarmed if you see these. If there is actually an error, it will be present among the last several messages issued by the compiler.
 ```
@@ -68,7 +73,7 @@ betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 500, nSimImai = 500, SEED = 1, plot.p
 plot.name = "reverseMAplotBoth.pdf", alpha_level = 0.05, use_cpp=T, use_multi_processing=T, num_jobs=4)
 ```
 
-### Important Caveats for the Faster Processing Strategies:
+### Important Considerations for the Faster Processing Strategies:
 
 It is advisable that you tailor your num_jobs variable to be the # of your CPU cores - 1, at the maximum, to leave 1 core free to handle the original calling R process and any background OS processes. If you use too many procesess or threads, your system will become slow and relatively unresponsive and may lock up until the processing completes.
 
@@ -81,3 +86,6 @@ If you force-stop an R terminal or R process that has already begun a multi-proc
 ## Output
 
 <img src="https://github.com/SharonLutz/reverseC/blob/master/reverseMAplot.png" width="600">
+
+## Warning: Do not try to access package internals directly or do so at your own risk!
+If you try to run methods/functions that are not exported and intended for end users, and feed these functions environments, parameters, or values that are not correctly formed, it could result in an uncaught or uncatchable C++ exception or segmentation fault. If this occurs, it will kill your R session/terminal and if you were working within RStudio it will probably crash too.
