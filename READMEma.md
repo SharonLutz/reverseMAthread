@@ -85,7 +85,7 @@ If you force-stop an R terminal or R process that has already begun a multi-proc
 
 ## Output
 
-<img src="https://github.com/SharonLutz/reverseC/blob/master/reverseMAplot.png" width="600">
+<img src="plots/reverseMAplot.png" width="600">
 
 ## Warning: Do not try to access package internals directly or do so at your own risk!
 If you try to run methods/functions that are not exported and intended for end users, and feed these functions environments, parameters, or values that are not correctly formed, it could result in an uncaught or uncatchable C++ exception or segmentation fault. If this occurs, it will kill your R session/terminal and if you were working within RStudio it will probably crash too.

@@ -60,7 +60,7 @@ plot.name = "reverseMRplot.pdf", alpha_level = 0.05, SEED = 1001)
 For the example, we get corresponding plot. In the plot below, the methods ending in NR have the true outcome as the outcome where as the methods ending in R have the true outcome reversed with the mediator. When the mediator and outcome are reversed, the Egger regression and the Median Weighted Approach have an inflated type 1 error rate. While the IVW approach does not have an inflated type 1 error rate, there is very little difference in the IVW approach if the mediator and outcome are reversed, which implies that this approach cannot easily distinguish the causal relationship between the mediator and outcome.
 
 
-<img src="reverseMRplot.png" width="500">
+<img src="plots/reverseMRplot.png" width="500">
 
 ## Example 2:
 
@@ -73,7 +73,7 @@ reverseMRsim(n = 1000)
 ```
 
 ## Output 2:
-<img src="reverseDirectionplot.png" width="500">
+<img src="plots/reverseDirectionplot.png" width="500">
 
 ## Warning: Do not try to access package internals directly or do so at your own risk!
 If you try to run methods/functions that are not exported and intended for end users, and feed these functions environments, parameters, or values that are not correctly formed, it could result in an uncaught or uncatchable C++ exception or segmentation fault. If this occurs, it will kill your R session/terminal and if you were working within RStudio it will probably crash too.
