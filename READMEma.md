@@ -82,9 +82,13 @@ Opening the start menu and searching for System Information, or running %windir%
 Additionally, the rows containing the entries "Total Physical Memory" and "Available Physical Memory" will help you when determining how many processes you can run safely in multiprocessing mode. You can also benefit from the use of Task Manager. Ctrl-Alt-Esc or Ctrl-Alt-Del can be used to bring up Task manager depending on your version of Windows. 
 
 For Mac OSX:
-From a terminal: sysctl hw.physicalcpu hw.logicalcpu should show the number of physical and logical cores.
 
-sysctl hw.memsize displays the total available memory.
+From a terminal: 
+```
+sysctl hw.physicalcpu hw.logicalcpu #should show the number of physical and logical cores.
+
+sysctl hw.memsize #displays the total available memory.
+```
 
 the 'top' command can serve a similar functionality to the task manager in windows. It will monitor executing processes in real time and give you readouts on how much each process is consuming.
 
