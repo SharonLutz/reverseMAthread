@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // mediate_helper
 void mediate_helper(Rcpp::Environment& env);
-RcppExport SEXP _reverseC_mediate_helper(SEXP envSEXP) {
+RcppExport SEXP _reverseCT_mediate_helper(SEXP envSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::Environment& >::type env(envSEXP);
@@ -18,7 +18,7 @@ END_RCPP
 }
 // mediate_helper_variable_exporter
 void mediate_helper_variable_exporter(Rcpp::Environment& env);
-RcppExport SEXP _reverseC_mediate_helper_variable_exporter(SEXP envSEXP) {
+RcppExport SEXP _reverseCT_mediate_helper_variable_exporter(SEXP envSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::Environment& >::type env(envSEXP);
@@ -28,7 +28,7 @@ END_RCPP
 }
 // threaded_mediate_helper
 void threaded_mediate_helper(Rcpp::Environment& env, long long int num_threads);
-RcppExport SEXP _reverseC_threaded_mediate_helper(SEXP envSEXP, SEXP num_threadsSEXP) {
+RcppExport SEXP _reverseCT_threaded_mediate_helper(SEXP envSEXP, SEXP num_threadsSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::Environment& >::type env(envSEXP);
@@ -39,7 +39,7 @@ END_RCPP
 }
 // test
 void test(Rcpp::Environment& env);
-RcppExport SEXP _reverseC_test(SEXP envSEXP) {
+RcppExport SEXP _reverseCT_test(SEXP envSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::Environment& >::type env(envSEXP);
@@ -49,14 +49,14 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_reverseC_mediate_helper", (DL_FUNC) &_reverseC_mediate_helper, 1},
-    {"_reverseC_mediate_helper_variable_exporter", (DL_FUNC) &_reverseC_mediate_helper_variable_exporter, 1},
-    {"_reverseC_threaded_mediate_helper", (DL_FUNC) &_reverseC_threaded_mediate_helper, 2},
-    {"_reverseC_test", (DL_FUNC) &_reverseC_test, 1},
+    {"_reverseCT_mediate_helper", (DL_FUNC) &_reverseCT_mediate_helper, 1},
+    {"_reverseCT_mediate_helper_variable_exporter", (DL_FUNC) &_reverseCT_mediate_helper_variable_exporter, 1},
+    {"_reverseCT_threaded_mediate_helper", (DL_FUNC) &_reverseCT_threaded_mediate_helper, 2},
+    {"_reverseCT_test", (DL_FUNC) &_reverseCT_test, 1},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_reverseC(DllInfo *dll) {
+RcppExport void R_init_reverseCT(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

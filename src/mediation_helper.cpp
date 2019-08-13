@@ -5,8 +5,6 @@
 #endif
 #include "mediation_helper.hpp"
 
-
-
 OuterLoopVars::OuterLoopVars(SharedLocalMediateVariables &sv, std::size_t e) :
   e(e),
   tt(sv.tt_switch.at(e)),
