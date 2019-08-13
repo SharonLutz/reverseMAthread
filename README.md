@@ -22,6 +22,9 @@ install.packages("devtools") # devtools must be installed first
 # an update for one of the package dependencies
 install.packages(c("Rcpp","RcppEigen", "curl"), quiet=T) 
 
+#this package does not install automatically, but is needed by TwoSampleMR
+install.packages("psych")
+
 devtools::install_github("MRCIEU/TwoSampleMR") # this is a dependency not present in R CRAN, it should be installed before reverseC
 
 devtools::install_github("SharonLutz/reverseC",quiet=T)

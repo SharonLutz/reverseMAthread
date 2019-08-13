@@ -1,4 +1,4 @@
-Package: reverseC
+Package: reverseCT
 Type: Package
 Title: This package contains methods to run mediation analysis and MR with reverse causality
 Version: 1.1.0
@@ -23,8 +23,8 @@ Imports:
     mvtnorm,
     pbapply,
     TwoSampleMR
-URL: https://github.com/SharonLutz/reverseC
-BugReports: https://github.com/SharonLutz/reverseC/issues
+URL: https://github.com/SharonLutz/reverseCT
+BugReports: https://github.com/SharonLutz/reverseCT/issues
 RoxygenNote: 6.1.1
 Collate: 
     'RcppExports.R'
