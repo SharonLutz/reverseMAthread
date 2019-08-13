@@ -50,7 +50,7 @@ After the SNPs X, mediator M, and outcome Y are generated, then the reverseMRsim
 For 1,000 subjects (n=1000), we generated 10 SNPs (nSNP=10) with a minor allele frequency of 20% (specified by MAF) that have a genetic effect size of 0.4 (specified by gammaX) on the normally distributed mediator and the mediator has an effect size varying from 0, 0.2 to 0.3 (specified by betaM) on the normally distributed outcome. We considered 3 MR approaches: Egger Regression, the Median Weighted Approach, and the Inverse Variance Weighted (IVW) Approach.
 
 ```
-library(reverseC)
+library(reverseCT)
 ?reverseMRsim # For details on this function
 
 reverseMRsim(n = 1000, nSNP = 10, MAF = rep(0.2, 10), gamma0 = 0, gammaX = rep(0.4, 10), 
@@ -68,7 +68,7 @@ For the example, we get corresponding plot. In the plot below, the methods endin
 ## Example 2:
 
 ```
-library(reverseC)
+library(reverseCT)
 ?reverseDirection # For details on this function
 
 reverseMRsim(n = 1000)

@@ -32,7 +32,7 @@ warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragma
 
 ## Example:
 ```
-library(reverseC)
+library(reverseCT)
 ?reverseMAsim # For details on this function
 
 reverseMAsim(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0, 
