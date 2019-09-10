@@ -12,15 +12,10 @@ Requirements:
 ```
 install.packages("devtools") # devtools must be installed first
 
-# these will fail to install when already loaded, and install_github will sometimes 
+# these may fail to install or update/upgrade when already loaded, and install_github will sometimes 
 # load these as part of its activity, and will then try to install them if they need 
 # an update for one of the package dependencies
 install.packages(c("Rcpp","RcppEigen", "curl"), quiet=T) 
-
-#this package does not install automatically, but is needed by TwoSampleMR
-install.packages("psych")
-
-devtools::install_github("MRCIEU/TwoSampleMR") # this is a dependency not present in R CRAN, it should be installed before reverseMA
 
 devtools::install_github("SharonLutz/reverseMAthread",quiet=T)
 ```

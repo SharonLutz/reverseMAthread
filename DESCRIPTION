@@ -16,13 +16,11 @@ Depends: R (>= 3.5.1)
 Imports: 
     mediation,
     snow,
-    MendelianRandomization,
     methods,
     parallel,
     Rcpp,
     mvtnorm,
-    pbapply,
-    TwoSampleMR
+    pbapply
 URL: https://github.com/SharonLutz/reverseMAthread
 BugReports: https://github.com/SharonLutz/reverseMAthread/issues
 RoxygenNote: 6.1.1
