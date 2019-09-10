@@ -1,4 +1,4 @@
-Package: reverseCT
+Package: reverseMAthread
 Type: Package
 Title: This package contains methods to run mediation analysis and MR with reverse causality
 Version: 1.1.0
@@ -23,8 +23,8 @@ Imports:
     mvtnorm,
     pbapply,
     TwoSampleMR
-URL: https://github.com/SharonLutz/reverseCT
-BugReports: https://github.com/SharonLutz/reverseCT/issues
+URL: https://github.com/SharonLutz/reverseMAthread
+BugReports: https://github.com/SharonLutz/reverseMAthread/issues
 RoxygenNote: 6.1.1
 Collate: 
     'RcppExports.R'
@@ -32,15 +32,11 @@ Collate:
     'mediate_with_rcpp.R'
     'multi_process_mediate_impl.R'
     'multi_process_mediate.R'
-    'reverseCT-internal.R'
-    'reverseCT-package.R'
-    'reverseCT.R'
-    'reverseDirection.R'
-    'reverseMAdata.R'
-    'reverseMAsim_impl.R'
-    'reverseMAsim.R'
-    'reverseMRdata.R'
-    'reverseMRsim.R'
+    'reverseMA_impl.R'
+    'reverseMA.R'
+    'reverseMAthread-internal.R'
+    'reverseMAthread-package.R'
+    'reverseMAthread.R'
     'simple_mediate_result.R'
     'stripped_down_mediate.R'
     'test_mediation.R'

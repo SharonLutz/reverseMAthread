@@ -2,18 +2,18 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 mediate_helper <- function(env) {
-    invisible(.Call(`_reverseCT_mediate_helper`, env))
+    invisible(.Call(`_reverseMAthread_mediate_helper`, env))
 }
 
 mediate_helper_variable_exporter <- function(env) {
-    invisible(.Call(`_reverseCT_mediate_helper_variable_exporter`, env))
+    invisible(.Call(`_reverseMAthread_mediate_helper_variable_exporter`, env))
 }
 
 threaded_mediate_helper <- function(env, num_threads) {
-    invisible(.Call(`_reverseCT_threaded_mediate_helper`, env, num_threads))
+    invisible(.Call(`_reverseMAthread_threaded_mediate_helper`, env, num_threads))
 }
 
 test <- function(env) {
-    invisible(.Call(`_reverseCT_test`, env))
+    invisible(.Call(`_reverseMAthread_test`, env))
 }
 

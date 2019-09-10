@@ -1,6 +1,6 @@
 #' @include mediate_s4_classes.R multi_process_mediate.R
 
-#' @title reverseMAsim.SingleProcess
+#' @title reverseMA.SingleProcess
 #' @description A function to similate the performance of the mediate function from the mediation package in scenarios of reverse causality. Leverages threading and Rcpp with Eigen for faster computation speed.
 #' @author Michael Gooch, Annie Thwing, Sharon Lutz
 #' @param n is the sample size.
@@ -21,9 +21,9 @@
 #' @param use_cpp use Rcpp with Eigen
 #' @param num_jobs the number of cores to use, i.e. the number of threads to spawn
 #' @return a matrix of the power of the mediate method from the mediation package to detect an effect of the mediator M on the outcome Y when M and Y are correctly specified and also when they are incorrectly specified (the true mediator is Y and the true outcome is M)
-reverseMAsim.SingleProcess <- 
+reverseMA.SingleProcess <- 
   function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,0.2),varY=1,
-           nSim=100,nSimImai=1000,SEED=1,plot.pdf=T,plot.name="reverseMAsim.pdf",alpha_level=0.05, 
+           nSim=100,nSimImai=1000,SEED=1,plot.pdf=T,plot.name="reverseMA.pdf",alpha_level=0.05, 
            use_cpp=F, num_jobs=1){
     
     # cat("using One Process\n")
@@ -142,7 +142,7 @@ reverseMAsim.SingleProcess <-
     list(mat_total)
   }
 
-#' @title reverseMAsim.MultiProcess
+#' @title reverseMA.MultiProcess
 #' @description A function to similate the performance of the mediate function from the mediation package in scenarios of reverse causality. Leverages parallel processing and Rcpp with Eigen for faster computation speed.
 #' @author Michael Gooch, Annie Thwing, Sharon Lutz
 #' @param n is the sample size.
@@ -163,9 +163,9 @@ reverseMAsim.SingleProcess <-
 #' @param use_cpp use Rcpp with Eigen
 #' @param num_jobs the number of cores to use, i.e. the number of parallel procesess to spawn
 #' @return a matrix of the power of the mediate method from the mediation package to detect an effect of the mediator M on the outcome Y when M and Y are correctly specified and also when they are incorrectly specified (the true mediator is Y and the true outcome is M)
-reverseMAsim.MultiProcess <- 
+reverseMA.MultiProcess <- 
   function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,0.2),varY=1,
-           nSim=100,nSimImai=1000,SEED=1,plot.pdf=T,plot.name="reverseMAsim.pdf",alpha_level=0.05, 
+           nSim=100,nSimImai=1000,SEED=1,plot.pdf=T,plot.name="reverseMA.pdf",alpha_level=0.05, 
            use_cpp=F, num_jobs=2){
     # cat("using MultiProcessing\n")
     # Set the seed.

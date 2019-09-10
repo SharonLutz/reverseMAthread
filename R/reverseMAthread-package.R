@@ -1,6 +1,6 @@
 ## usethis namespace: start
 #' @importFrom Rcpp sourceCpp
-#' @useDynLib reverseCT, .registration = TRUE
+#' @useDynLib reverseMAthread, .registration = TRUE
 #' @import RcppEigen
 ## usethis namespace: end
 NULL

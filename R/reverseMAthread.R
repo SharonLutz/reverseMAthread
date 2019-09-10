@@ -1,8 +1,8 @@
 #' @details
 #' This package examines the performance of Mendelian Randomization (MR) and Mediation Analysis methods in the presence of reverse causality.
 #' 
-#' @section reverseC for Mendelian Randomization:
-#' The reverseMRsim function in the reverseC R package examines the performance of Mendelian Randomization (MR) methods in the presence of reverse causality. Through simulation studies, this R function examines the type 1 error rate and power for 3 popular MR methods when the role of the intermediate phenotype and outcome were correctly specified and when they were reversed (i.e. reverse causality).
+#' @section reverseMA for Mendelian Randomization with threading:
+#' The reverseMRsim function in the reverseMA R package examines the performance of Mendelian Randomization (MR) methods in the presence of reverse causality. Through simulation studies, this R function examines the type 1 error rate and power for 3 popular MR methods when the role of the intermediate phenotype and outcome were correctly specified and when they were reversed (i.e. reverse causality).
 #' 
 #' @section Mendelian Randomization Input:
 #' nSNP is the number of SNPs generated from a binomial distribution for n subjects (input n) for a given minor allele frequency (input vector MAF).
@@ -53,24 +53,24 @@
 #' Weighted Median Estimator. Genetic Epidemiology, 40(4), 304-314. 
 #' }
 #' 
-#' @section reverseC for Mediation Analysis:
+#' @section reverseMA for Mediation Analysis:
 #' These functions examines the performance of mediation analysis methods in the presence of reverse causality.
 #' 
 #' @section Mediation Analysis Example:
 #' 
 #' \preformatted{
-#' library(reverseC)
-#' ?reverseMAsim # For details on this function
+#' library(reverseMAthread)
+#' ?reverseMA # For details on this function
 #' 
-#' reverseMAsim(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0, 
+#' reverseMA(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0, 
 #'              betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 500, nSimImai = 500, SEED = 1, plot.pdf = T, 
 #'              plot.name = "reverseMAplot.pdf", alpha_level = 0.05)
 #' 
-#' reverseMAsim(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0, varM = 1, beta0 = 0, betaX = 0.2, 
+#' reverseMA(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0, varM = 1, beta0 = 0, betaX = 0.2, 
 #'              betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 500, nSimImai = 500, SEED = 1, plot.pdf = T, 
 #'              plot.name = "reverseMAplotDirect.pdf", alpha_level = 0.05)
 #' 
-#' reverseMAsim(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
+#' reverseMA(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
 #'              betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 500, nSimImai = 500, SEED = 1, plot.pdf = T, 
 #'              plot.name = "reverseMAplotBoth.pdf", alpha_level = 0.05)
 #' }
@@ -78,11 +78,11 @@
 #' 
 #' The example code produces this plot:
 #' \if{html}{\figure{reverseMAplot.png}{alt="MA_PLOT_image_placeholder"}}
-#' \if{latex}{\figure{reverseMAsim.pdf}{alt="MA_PLOT_image_placeholder"}}
+#' \if{latex}{\figure{reverseMA.pdf}{alt="MA_PLOT_image_placeholder"}}
 #' 
 #' @section Installation:
 #' \preformatted{
 #' install.packages("devtools") # devtools must be installed first
-#' devtools::install_github("SharonLutz/reverseC")
+#' devtools::install_github("SharonLutz/reverseMAthread")
 #' }
 "_PACKAGE"
