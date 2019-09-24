@@ -26,18 +26,15 @@ BugReports: https://github.com/SharonLutz/reverseMAthread/issues
 RoxygenNote: 6.1.1
 Collate: 
     'RcppExports.R'
-    'mediate_s4_classes.R'
+    'generate_data_matrix.R'
+    'input_error_check.R'
+    'pval.R'
     'mediate_with_rcpp.R'
-    'multi_process_mediate_impl.R'
+    'simulate_and_mediate.R'
     'multi_process_mediate.R'
-    'reverseMA_impl.R'
-    'reverseMA.R'
     'reverseMAthread-internal.R'
     'reverseMAthread-package.R'
     'reverseMAthread.R'
-    'simple_mediate_result.R'
-    'stripped_down_mediate.R'
-    'test_mediation.R'
 LinkingTo: 
     Rcpp,
     RcppEigen

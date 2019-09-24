@@ -1,88 +1,107 @@
-#' @details
-#' This package examines the performance of Mendelian Randomization (MR) and Mediation Analysis methods in the presence of reverse causality.
-#' 
-#' @section reverseMA for Mendelian Randomization with threading:
-#' The reverseMRsim function in the reverseMA R package examines the performance of Mendelian Randomization (MR) methods in the presence of reverse causality. Through simulation studies, this R function examines the type 1 error rate and power for 3 popular MR methods when the role of the intermediate phenotype and outcome were correctly specified and when they were reversed (i.e. reverse causality).
-#' 
-#' @section Mendelian Randomization Input:
-#' nSNP is the number of SNPs generated from a binomial distribution for n subjects (input n) for a given minor allele frequency (input vector MAF).
-#' 
-#' For the SNPs Xi, the mediator/ exposure M is generated from a normal distribution with the variance (input varM) and the mean as follows:
-#' 
-#' \eqn{E[M] = \gamma_0 + \Sigma \gamma_x * X_i}
-#' 
-#' All of these values are inputted by the user (i.e. the intercept gamma0, and the genetic effect size as a vector gammaX).
-#' 
-#' The outcome Y is generated from a normal distribution with the variance (input varY) and the mean as follows:
-#'  
-#' \eqn{E[Y] = \beta_0 + \beta_M * M}
-#' 
-#' All of these values are inputted by the user (i.e. the intercept beta0 and the effect of the mediator directly on the outcome as betaM).
-#'
-#' After the SNPs X, mediator M, and outcome Y are generated, then the reverseMRsim function compares the power and type 1 error rate of the following 3 methods to detect the path from M to Y: Egger Regression, the Median Weighted Approach, and the Inverse Variance Weighted (IVW) Approach.
-#' 
-#' @section Mendelian Randomization Example:
-#' 
-#' For 1,000 subjects (n=1000), we generated 10 SNPs (nSNP=10) with a minor allele frequency of 20\% (specified by MAF) that have a genetic effect size of 0.4 (specified by gammaX) on the normally distributed mediator and the mediator has an effect size varying from 0, 0.2 to 0.3 (specified by betaM) on the normally distributed outcome. We considered 3 MR approaches: Egger Regression, the Median Weighted Approach, and the Inverse Variance Weighted (IVW) Approach.
-#' 
-#' @section Mendelian Randomization Output:
-#' 
-#' For the example, we get corresponding plot. In the plot below, the methods ending in NR have the true outcome as the outcome where as the methods ending in R have the true outcome reversed with the mediator. When the mediator and outcome are reversed, the Egger regression and the Median Weighted Approach have an inflated type 1 error rate. While the IVW approach does not have an inflated type 1 error rate, there is very little difference in the IVW approach if the mediator and outcome are reversed, which implies that this approach cannot easily distinguish the causal relationship between the mediator and outcome.
-#' 
-#' \if{html}{\figure{reverseMRplot.png}{alt="MR_PLOT_image_placeholder"}}
-#' \if{latex}{\figure{reverseMRsim.pdf}{alt="MR_PLOT_image_placeholder"}}
-#' 
-#' 
-#' @references  
-#' MR.Egger is the Egger Regression approach to MR.
-#' \preformatted{
-#' Bowden J., Davey Smith G., & Burgess S. (2015). Mendelian Randomization 
-#' with invalid instruments: effect estimation and bias detection through 
-#' Egger regression. International Journal of Epidemiology, 44(2), 512-525. 
-#' }
-#' MR.IVW is the Inverse Variant Weighted approach to MR.
-#' \preformatted{
-#' Burgess, S., Butterworth, A., & Thompson, S. G. (2013). Mendelian 
-#' Randomization Analysis With Multiple Genetic Variants Using Summarized 
-#' Data. Genetic Epidemiology, 37(7), 658-665.
-#' }
-#' MR. Median is the Median Weighted approach to MR.
-#' \preformatted{
-#' Bowden, J., Davey Smith, G., Haycock, P. C., & Burgess, S. (2016). Consistent 
-#' Estimation in Mendelian Randomization with Some Invalid Instruments Using a 
-#' Weighted Median Estimator. Genetic Epidemiology, 40(4), 304-314. 
-#' }
-#' 
-#' @section reverseMA for Mediation Analysis:
-#' These functions examines the performance of mediation analysis methods in the presence of reverse causality.
-#' 
-#' @section Mediation Analysis Example:
-#' 
-#' \preformatted{
-#' library(reverseMAthread)
-#' ?reverseMA # For details on this function
-#' 
-#' reverseMA(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0, 
-#'              betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 500, nSimImai = 500, SEED = 1, plot.pdf = T, 
-#'              plot.name = "reverseMAplot.pdf", alpha_level = 0.05)
-#' 
-#' reverseMA(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0, varM = 1, beta0 = 0, betaX = 0.2, 
-#'              betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 500, nSimImai = 500, SEED = 1, plot.pdf = T, 
-#'              plot.name = "reverseMAplotDirect.pdf", alpha_level = 0.05)
-#' 
-#' reverseMA(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
-#'              betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 500, nSimImai = 500, SEED = 1, plot.pdf = T, 
-#'              plot.name = "reverseMAplotBoth.pdf", alpha_level = 0.05)
-#' }
-#' @section Mediation Analysis Output:
-#' 
-#' The example code produces this plot:
-#' \if{html}{\figure{reverseMAplot.png}{alt="MA_PLOT_image_placeholder"}}
-#' \if{latex}{\figure{reverseMA.pdf}{alt="MA_PLOT_image_placeholder"}}
-#' 
-#' @section Installation:
-#' \preformatted{
-#' install.packages("devtools") # devtools must be installed first
-#' devtools::install_github("SharonLutz/reverseMAthread")
-#' }
-"_PACKAGE"
+#' @include generate_data_matrix.R
+#' @include input_error_check.R
+#' @include simulate_and_mediate.R
+#' @include multi_process_mediate.R
+
+#' @export
+#' @title reverseMAthread
+#' @description A function to simulate the performance of the mediate function from the mediation package in scenarios of reverse causality.
+#' @author Annie Thwing, Sharon Lutz
+#' @param n is the sample size.
+#' @param pX is the minor allele frequency
+#' @param gamma0 is the intercept for M
+#' @param gammaX is the association of X with M
+#' @param varM is the variance of M
+#' @param beta0 is the intercept for Y
+#' @param betaX is the direct effect of X on Y
+#' @param betaM is a vector of different associations of M with Y
+#' @param varY is the variance of Y
+#' @param nSim is the number of simulations to run
+#' @param nSimImai is the number of simulations to run in mediate from the mediation package
+#' @param SEED is the seed
+#' @param plot.pdf is T to output a plot, is F to not output a plot
+#' @param plot.name is the name of the plot
+#' @param alpha_level is the significance level
+#' @param use_multi_processing use multi_processing instead of threading for a speed boost
+#' @param use_cpp use Rcpp with Eigen
+#' @param num_jobs the number of cores to use, i.e. the number of parallel procesess or threads to spawn
+#' @return a matrix of the power of the mediate method from the mediation package to detect an effect of the mediator M on the outcome Y when M and Y are correctly specified and also when they are incorrectly specified (the true mediator is Y and the true outcome is M)
+reverseMAthread <-
+  function(n=1000,pX=0.2,gamma0=0,gammaX=0.1,varM=1,beta0=0,betaX=1,betaM=c(0,0.1,0.2),varY=1,
+           nSim=100,nSimImai=1000,SEED=1,plot.pdf=T,plot.name="reverseMAsim.pdf",alpha_level=0.05, 
+           use_multi_processing=F, use_cpp=F, num_jobs=1){
+    
+    pbapply::pboptions(style=1,type="timer")
+    
+    input_error_check(n=n,pX=pX,gamma0=gamma0,gammaX=gammaX,varM=varM,beta0=beta0,betaX=betaX,betaM=betaM,varY=varY,
+                      nSim=nSim,nSimImai=nSimImai,alpha_level=alpha_level, 
+                      use_multi_processing=use_multi_processing, use_cpp=use_cpp, num_jobs=num_jobs)
+    
+    mat_total <- matrix(0,nrow=length(betaM),ncol=4)
+    colnames(mat_total) <- c("DirectNR","IndirectNR","DirectR","IndirectR")
+    #generate the data needed to make linear models.
+    data_matrix = generate_data_matrix(n=n, pX=pX, gamma0=gamma0, gammaX=gammaX, varM=varM, 
+                                       beta0=beta0, betaX=betaX, betaM=betaM, varY=varY, nSim=nSim, 
+                                       nSimImai=nSimImai, SEED=SEED, use_cpp=use_cpp, num_jobs=num_jobs)
+    
+    # cat("running mediation on models")
+    
+    if(use_multi_processing){
+      result.matrix = mediate_parallel(data_matrix, num_jobs = num_jobs)
+    } else {
+      result.matrix = pbapply::pblapply(data_matrix, simulate_and_mediate)
+      dim(result.matrix) = dim(data_matrix)
+    }
+    rm(data_matrix)
+    
+    # print("processing results")
+    for(i in 1:nSim){
+      #if(floor(i/10)==ceiling(i/10)){print(paste(i,"of",nSim,"simulations"))}
+      
+      # Create matrix to store the results
+      mat_results <- matrix(0,nrow=length(betaM),ncol=4)
+      colnames(mat_results) <- c("DirectNR","IndirectNR","DirectR","IndirectR")
+      
+      for(bM.ind in 1:length(betaM)){
+        
+        # Get the direct and indirect effects
+        pval_direct <- result.matrix[[bM.ind,i]][["pval_direct"]]
+        pval_indirect <- result.matrix[[bM.ind,i]][["pval_indirect"]]
+        
+        # Add to the matrix
+        if(pval_direct<alpha_level){mat_results[bM.ind,"DirectNR"] <- mat_results[bM.ind,"DirectNR"]+1 }
+        if(pval_indirect<alpha_level){mat_results[bM.ind,"IndirectNR"] <- mat_results[bM.ind,"IndirectNR"]+1 }
+        
+        # Get the direct and indirect effects
+        pval_direct_r <- result.matrix[[bM.ind,i]][["pval_direct_r"]]
+        pval_indirect_r <- result.matrix[[bM.ind,i]][["pval_indirect_r"]]
+        
+        # Add to the matrix
+        if(pval_direct_r<alpha_level){mat_results[bM.ind,"DirectR"] <- mat_results[bM.ind,"DirectR"]+1 }
+        if(pval_indirect_r<alpha_level){mat_results[bM.ind,"IndirectR"] <- mat_results[bM.ind,"IndirectR"]+1 }
+        
+      } # End of bM.ind
+      
+      mat_total <- mat_total+mat_results
+      
+    } # End of nSim
+    
+    rm(result.matrix)
+    
+    mat_total <- mat_total/nSim
+    
+    if(plot.pdf){
+      pdf(plot.name)
+      plot(-1,-1, xlim=c(min(betaM),max(betaM)), ylim=c(0,1),xlab="betaM values",ylab="")
+      points(betaM,mat_total[,"DirectNR"],type="b",lty=2,col=1,pch=1)
+      points(betaM,mat_total[,"IndirectNR"],type="b",lty=3,col=2,pch=2)
+      points(betaM,mat_total[,"DirectR"],type="b",lty=4,col=3,pch=3)
+      points(betaM,mat_total[,"IndirectR"],type="b",lty=5,col=4,pch=4)
+      legend("left",lty=c(2:5),col=c(1:4),pch=c(1:4),legend=c("DirectNR","IndirectNR","DirectR","IndirectR"))
+      dev.off()
+    }
+    
+    # Print out the matrix
+    list(mat_total)
+    
+  }

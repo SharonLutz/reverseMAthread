@@ -4,13 +4,13 @@
 \alias{mediate_parallel}
 \title{Perform Mediation Using Parallel Processing}
 \usage{
-mediate_parallel(list_of_job_args, nSimImai = 1000, use_cpp = F,
-  num_jobs = getOption("mediate.jobs", parallel::detectCores() - 1))
+mediate_parallel(list_of_job_args, num_jobs = getOption("mediate.jobs",
+  parallel::detectCores() - 1))
 }
 \arguments{
-\item{list_of_job_args}{A list of \code{MediateModelVariables} objects}
+\item{list_of_job_args}{A list or matrix of list objects with named positions that can be used as inputs to simulate_and_mediatie}
 
-\item{nSimImai}{number of mediation sims to perform}
+\item{num_jobs}{number of parallel processes to use}
 }
 \value{
 list of \code{MediationProbValues} objects
