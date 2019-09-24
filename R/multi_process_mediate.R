@@ -27,7 +27,7 @@ mediate_parallel.non_unix <-function(list_of_job_args, num_jobs=1) {
   
   result <- pbapply::pblapply(list_of_job_args, simulate_and_mediate, cl=this.cluster)
   
-  attr(result, "dim") <- dim(list_of_job_args)
+  dim(result) <- dim(list_of_job_args)
   
   return (result)
 }

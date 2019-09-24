@@ -4,8 +4,7 @@
 \alias{mediate_parallel}
 \title{Perform Mediation Using Parallel Processing}
 \usage{
-mediate_parallel(list_of_job_args, num_jobs = getOption("mediate.jobs",
-  parallel::detectCores() - 1))
+mediate_parallel(list_of_job_args, num_jobs = 1)
 }
 \arguments{
 \item{list_of_job_args}{A list or matrix of list objects with named positions that can be used as inputs to simulate_and_mediatie}

@@ -7,13 +7,6 @@ simulate_and_mediate <- function(data_element){
   use_cpp = data_element[["use_cpp"]]
   num_jobs = data_element[["num_jobs"]]
   use_multi_processing = data_element[["use_multi_processing"]]
-  if(use_cpp){
-    if(use_multi_processing){
-      options(mediate.threads = 1)
-    } else {
-      options(mediate.threads = num_jobs)
-    }
-  }
   
   nSimImai = data_element[["nSimImai"]]
   
@@ -31,6 +24,13 @@ simulate_and_mediate <- function(data_element){
   .GlobalEnv[[".Random.seed"]] = data_element[["RAND_STATE"]]
   
   if(use_cpp){
+    
+    if(use_multi_processing){
+      options(mediate.threads = 1)
+    } else {
+      options(mediate.threads = num_jobs)
+    }
+    
     med.out <- mediate_with_rcpp(med.fit, out.fit, treat = "X",mediator = "M1",sims = nSimImai)
     med.out.r <- mediate_with_rcpp(med.fit.r, out.fit.r, treat = "X",mediator = "M2",sims = nSimImai)
   } else {
