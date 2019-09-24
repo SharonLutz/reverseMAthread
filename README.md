@@ -1,5 +1,5 @@
 
-## reverseMA for Mediation Analysis with Threading
+## Extension of reverseMA with Threading
 These functions examines the performance of mediation analysis methods in the presence of reverse causality.
 
 ## Installation
@@ -26,46 +26,46 @@ warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragma
 
 ## Example:
 ```
-library(reverseMAT)
+library(reverseMAthread)
 ?reverseMA # For details on this function
 
-reverseMA(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0, 
+reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0, 
 betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
 plot.name = "reverseMAplotIndirect.pdf", alpha_level = 0.05)
 
- reverseMA(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0, varM = 1, beta0 = 0, betaX = 0.2, 
+ reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0, varM = 1, beta0 = 0, betaX = 0.2, 
 betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
 plot.name = "reverseMAplotDirect.pdf", alpha_level = 0.05)
 
- reverseMA(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
+ reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
 betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
 plot.name = "reverseMAplotBoth.pdf", alpha_level = 0.05)
 ```
 
 ## Speeding things up with optional parameters:
 ### MultiProcessing And/Or Use of Threading and Eigen via C++
-the reverseMA command accepts the following parameters:
+the reverseMAthread command accepts the following parameters:
 * use_multi_processing, a boolean (T, F, True, or False), which turns on the multi-processing feature
 * use_cpp, a boolean(T, F, True, or False), which activates the use of Rcpp RcppEigen, and threading if multiprocessing is not turned on as well.
 * num_jobs, an integer specifying the number of processes or threads you wish to use.
 ```
 #Example Using Rcpp with Eigen and 5 threads:
 
-reverseMA(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
+reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
 betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
 plot.name = "reverseMAplot.pdf", alpha_level = 0.05, use_cpp=T, num_jobs=5)
 
 
 #Example Using MultiProcessing and vanilla R (without using Rcpp with Eigen) with 7 subprocesses:
 
-reverseMA(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
+reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
 betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
 plot.name = "reverseMAplot.pdf", alpha_level = 0.05, use_multi_processing=T, num_jobs=7)
 
 
 #Example Using MultiProcessing and Rcpp with Eigen with 4 subprocesses (1 thread each):
 
-reverseMA(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
+reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
 betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
 plot.name = "reverseMAplot.pdf", alpha_level = 0.05, use_cpp=T, use_multi_processing=T, num_jobs=4)
 ```
