@@ -4,7 +4,7 @@ input_error_check <- function(n,pX,gamma0,gammaX,varM,beta0,betaX,betaM,varY,
   
   if(alpha_level>1 | alpha_level<0){stop("Error: alpha_level must be between 0 and 1")}
   if(length(nSimImai) != 1){stop ("Error: nSimImai must be a single integer value")}
-  if(nSimImai<=0 || floor(nSimImai)!=ceiling(nSimImai) ){stop("Error: n must be an integer greater than or equal to 1")}
+  if(nSimImai<=0 || floor(nSimImai)!=ceiling(nSimImai) ){stop("Error: nSimImai must be an integer greater than or equal to 1")}
   
   # Error checks
   
@@ -25,7 +25,7 @@ input_error_check <- function(n,pX,gamma0,gammaX,varM,beta0,betaX,betaM,varY,
   
   #INT style values
   if(n<=0 || floor(n)!=ceiling(n) ){stop("Error: n must be an integer greater than or equal to 1")}
-  if(nSim<=0 || floor(nSim)!=ceiling(nSim) ){stop("Error: n must be an integer greater than or equal to 1")}
+  if(nSim<=0 || floor(nSim)!=ceiling(nSim) ){stop("Error: nSim must be an integer greater than or equal to 1")}
   
   #valid input checks
   
