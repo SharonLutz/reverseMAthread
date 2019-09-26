@@ -1,8 +1,4 @@
 
-#' @title Simulate Data and Mediate Linear Models
-#' @description runs forward and reverse mediation on argument contents
-#' @param data_element list with named elements that will be used to assemble linear models to use with mediation
-#' @return a \code{MediationProbValues} instance with values obtained by running mediate on forward and reverse linear models.
 simulate_and_mediate <- function(data_element){
   use_cpp = data_element[["use_cpp"]]
   num_jobs = data_element[["num_jobs"]]
