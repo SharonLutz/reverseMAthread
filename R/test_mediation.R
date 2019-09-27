@@ -498,26 +498,26 @@ compare_loop_envs <- function(env1, env2) {
 
 mediation.test.compare <- function(n=100, sims=100){
   set.seed(1)
-  param = reverseC::MediateDataGenerationParameters(n=n, nSim=1)
-  data_item = reverseC::generateDataMatrix(param)[[1]]
-  models = reverseC::assembleLinearModels(data_item)
+  param = reverseMAthread::MediateDataGenerationParameters(n=n, nSim=1)
+  data_item = reverseMAthread::generateDataMatrix(param)[[1]]
+  models = reverseMAthread::assembleLinearModels(data_item)
   set.seed(1)
-  pre_func_env = reverseC::test.mediate.vanilla(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=sims,return_context=T, context_before=T)
+  pre_func_env = reverseMAthread::test.mediate.vanilla(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=sims,return_context=T, context_before=T)
   export_environment(pre_func_env)
   set.seed(1)
   cat("Running Vanilla R Mediation\n")
   tic("Vanilla R Mediation")
-  vanilla_env = reverseC::test.mediate.vanilla(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=sims,return_context=T, context_before=F, export_loop_vars=T)
+  vanilla_env = reverseMAthread::test.mediate.vanilla(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=sims,return_context=T, context_before=F, export_loop_vars=T)
   toc()
-  vanilla_loop_env = reverseC::collect_vanillaR_loop_exports()
+  vanilla_loop_env = reverseMAthread::collect_vanillaR_loop_exports()
   set.seed(1)
   cat("Running Rcpp/Eigen Assisted Mediation with 1 Thread\n")
   tic("Rcpp/Eigen Assisted Mediation with 1 Thread")
-  rcpp_env_n1 = reverseC::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=sims,return_context=T, context_before=F, num_cores=1, export_loop_vars=T)
+  rcpp_env_n1 = reverseMAthread::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=sims,return_context=T, context_before=F, num_cores=1, export_loop_vars=T)
   toc()
-  rcpp_loop_env = reverseC::collect_rcpp_loop_exports()
+  rcpp_loop_env = reverseMAthread::collect_rcpp_loop_exports()
   
-  # rcpp_env = reverseC::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=100,return_context=T, context_before=F, num_cores=7)
+  # rcpp_env = reverseMAthread::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=100,return_context=T, context_before=F, num_cores=7)
   genv = globalenv()
   genv[["rcpp_env"]] = rcpp_env
   genv[["vanilla_env"]] = vanilla_env
@@ -529,17 +529,17 @@ mediation.test.compare <- function(n=100, sims=100){
   cat("Running Rcpp/Eigen Assisted Mediation with 2 Threads\n")
   set.seed(1)
   tic("Rcpp/Eigen Assisted Mediation with 2 Threads")
-  rcpp_env_n2 = reverseC::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=sims,return_context=T, context_before=F, num_cores=2)
+  rcpp_env_n2 = reverseMAthread::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=sims,return_context=T, context_before=F, num_cores=2)
   toc()
   cat("Running Rcpp/Eigen Assisted Mediation with 4 Threads\n")
   set.seed(1)
   tic("Rcpp/Eigen Assisted Mediation with 4 Threads")
-  rcpp_env_n4 = reverseC::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=sims,return_context=T, context_before=F, num_cores=4)
+  rcpp_env_n4 = reverseMAthread::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=sims,return_context=T, context_before=F, num_cores=4)
   toc()
   cat("Running Rcpp/Eigen Assisted Mediation with 7 Threads\n")
   set.seed(1)
   tic("Rcpp/Eigen Assisted Mediation with 7 Threads")
-  rcpp_env_n7 = reverseC::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=sims,return_context=T, context_before=F, num_cores=7)
+  rcpp_env_n7 = reverseMAthread::test.mediate.rcpp(models@med.fit, models@out.fit, treat="X", mediator="M1", sims=sims,return_context=T, context_before=F, num_cores=7)
   toc()
   #Make sure that all the rcpp thread strategies return the same et{#} matrices
   local_env = environment()
@@ -586,7 +586,7 @@ test_all_option_combos <- function(num_jobs=2, nJobsIter=2, nSimImai=1000, n=100
           case_name = paste(paste("use_cpp:",use_cpp,"use_multi_processing:",use_multi_processing,"jobs:",jobs), sep="")
           cat(case_name)
           cat("\n")
-          reverseC::reverseMAsim(use_cpp = use_cpp, use_multi_processing = use_multi_processing, num_jobs = jobs, nSim = nSim, nSimImai = nSimImai, n=n)
+          reverseMAthread::reverseMAthread(use_cpp = use_cpp, use_multi_processing = use_multi_processing, num_jobs = jobs, nSim = nSim, nSimImai = nSimImai, n=n)
           cat("\n")
         }
       }
