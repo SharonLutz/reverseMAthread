@@ -60,7 +60,7 @@ plot.name = "reverseMAplot.pdf", alpha_level = 0.05, use_cpp=T, num_jobs=5)
 
 reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
 betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
-plot.name = "reverseMAplot.pdf", alpha_level = 0.05, use_multi_processing=T, num_jobs=7)
+plot.name = "reverseMAplot.pdf", alpha_level = 0.05, use_multi_processing=T, num_jobs=5)
 
 
 #Example Using MultiProcessing and Rcpp with Eigen with 4 subprocesses (1 thread each):
