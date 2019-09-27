@@ -27,7 +27,7 @@ warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragma
 ## Example:
 ```
 library(reverseMAthread)
-?reverseMA # For details on this function
+?reverseMAthread # For details on this function
 
 reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0, 
 betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
