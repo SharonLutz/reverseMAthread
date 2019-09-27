@@ -91,13 +91,13 @@ mediate_parallel.non_unix <-function(list_of_job_args, nSimImai=1000, use_cpp=F,
   snow::setDefaultClusterOptions(type="SOCK")
   this.cluster <- snow::makeCluster(num_jobs)
   on.exit(snow::stopCluster(this.cluster))
-  #make sure reverseC is loaded on the nodes
-  if(pkgload::is_dev_package("reverseC")){
+  #make sure reverseMAthread is loaded on the nodes
+  if(pkgload::is_dev_package("reverseMAthread")){
     #we're in a dev environment, need to load with load_all
     snow::clusterCall(cl=this.cluster,function(){suppressMessages(library(devtools));suppressMessages(load_all())})
   } else {
-    #we're being used from an installed copy of reverseC load package explicitly
-    snow::clusterCall(cl=this.cluster,function(){suppressMessages(library(reverseC))})
+    #we're being used from an installed copy of reverseMAthread load package explicitly
+    snow::clusterCall(cl=this.cluster,function(){suppressMessages(library(reverseMAthread))})
   }
   
   snow::clusterExport(cl=this.cluster,c("nSimImai"),envir=environment())
