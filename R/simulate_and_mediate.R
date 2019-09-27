@@ -14,6 +14,8 @@ simulate_and_mediate <- function(data_element){
   med.fit.r = lm("M2~X", data=df)
   out.fit.r = lm("Y2~X+M2", data=df)
   
+  old_rand_state = NULL
+  
   if(exists(".Random.seed",envir = .GlobalEnv) && !is.null(.GlobalEnv[[".Random.seed"]])){
     old_rand_state = .GlobalEnv[[".Random.seed"]]
   }

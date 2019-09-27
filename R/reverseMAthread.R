@@ -45,8 +45,8 @@ reverseMAthread <-
       for(bM.ind in 1:length(betaM)){
         data_matrix_element = result.matrix[[bM.ind,i]]
         
-        summary_obj = summary(data_matrix_element[["med.out"]])
-        summary_obj.r = summary(data_matrix_element[["med.out.r"]])
+        summary_obj = mediation::summary.mediate(data_matrix_element[["med.out"]])
+        summary_obj.r = mediation::summary.mediate(data_matrix_element[["med.out.r"]])
         
         # Get the direct and indirect effects
         pval_direct <- summary_obj[["z.avg.p"]]
