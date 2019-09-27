@@ -35,25 +35,40 @@ the reverseMAthread command accepts the following parameters:
 library(reverseMAthread)
 ?reverseMAthread # For details on this function
 
+#Example Using Vanilla R without MultiProcessing:
+
+testRMA1 = reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
+betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
+plot.name = "reverseMAplot.pdf", alpha_level = 0.05)
+
+testRMA1
+
+
 #Example Using Rcpp with Eigen and 5 threads:
 
-reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
+testRMA2 = reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
 betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
 plot.name = "reverseMAplot.pdf", alpha_level = 0.05, use_cpp=T, num_jobs=5)
+
+testRMA2
 
 
 #Example Using MultiProcessing and vanilla R (without using Rcpp with Eigen) with 7 subprocesses:
 
-reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
+testRMA3 = reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
 betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
-plot.name = "reverseMAplot.pdf", alpha_level = 0.05, use_multi_processing=T, num_jobs=5)
+plot.name = "reverseMAplot.pdf", alpha_level = 0.05, use_multi_processing=T, num_jobs=7)
+
+testRMA3
 
 
 #Example Using MultiProcessing and Rcpp with Eigen with 4 subprocesses (1 thread each):
 
-reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
+testRMA4 = reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
 betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
 plot.name = "reverseMAplot.pdf", alpha_level = 0.05, use_cpp=T, use_multi_processing=T, num_jobs=4)
+
+testRMA4
 ```
 
 ### Important Considerations for the Faster Processing Strategies:
@@ -95,6 +110,14 @@ If your system is fairly low on available RAM, but you do have enough to run the
 
 If you force-stop an R terminal or R process that has already begun a multi-processing task, it may not be able to close all the child processes before it terminates. They will have to be stopped/killed before they will stop consuming CPU cycles and Memory and release the system resources.
 
+#### Multiprocessing Consumes More Memory and Spawns Extra R Processes
+If you use multi-processing several instances of the R interpreter will be spawned, either via Forking (copying the entire R process and all objects in memory into a sub-process) or simply spawning a new R instance and initializing it by loading the required libraries.
+
+Each instance will be executing the mediation function on a subset of the simulated data and linear models, so in addition to the overhead of having several instances of R, and possibly the data in your environment copied due to using forking, you'll also be consuming the memory required for the mediation function across each process. So be sure to pay attention to system resource consumption if your parameters call for a lot of data to be generated across all of the jobs as well as per-job. 
+
+For most use cases you will probably be able to make use of multiprocessing, but if your parameters will tip the scales in terms of memory consumption, you might be better off simply using Rcpp with Eigen without activating multiprocessing and make use of the speed boosts gained via threading with a smaller memory footprint.
+
+The input parameters n, nSim, and the length of betaM (number of elements in the vector) will all impact the amount of memory consumed.
 
 
 ## Output
