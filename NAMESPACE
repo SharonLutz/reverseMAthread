@@ -2,6 +2,7 @@
 
 export(reverseMAthread)
 import(RcppEigen)
+import(mediation)
+import(pbapply)
 importFrom(Rcpp,sourceCpp)
-importFrom(mediation,mediate)
 useDynLib(reverseMAthread, .registration = TRUE)

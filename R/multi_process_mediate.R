@@ -1,6 +1,5 @@
 #' @include simulate_and_mediate.R
-#' @importFrom mediation mediate
-
+#' @import pbapply
 
 mediate_parallel.unix <- function(list_of_job_args, num_jobs=1) {
   options(mc.cores = num_jobs)

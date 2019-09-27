@@ -2,6 +2,8 @@
 #' @include input_error_check.R
 #' @include simulate_and_mediate.R
 #' @include multi_process_mediate.R
+#' @import mediation
+#' @import pbapply
 
 #' @export
 reverseMAthread <-
@@ -42,17 +44,21 @@ reverseMAthread <-
       
       for(bM.ind in 1:length(betaM)){
         data_matrix_element = result.matrix[[bM.ind,i]]
+        
+        summary_obj = summary(data_matrix_element[["med.out"]])
+        summary_obj.r = summary(data_matrix_element[["med.out.r"]])
+        
         # Get the direct and indirect effects
-        pval_direct <- data_matrix_element[["pval_direct"]]
-        pval_indirect <- data_matrix_element[["pval_indirect"]]
+        pval_direct <- summary_obj[["z.avg.p"]]
+        pval_indirect <- summary_obj[["d.avg.p"]]
         
         # Add to the matrix
         if(pval_direct<alpha_level){mat_results[bM.ind,"DirectNR"] <- mat_results[bM.ind,"DirectNR"]+1 }
         if(pval_indirect<alpha_level){mat_results[bM.ind,"IndirectNR"] <- mat_results[bM.ind,"IndirectNR"]+1 }
         
         # Get the direct and indirect effects
-        pval_direct_r <- data_matrix_element[["pval_direct_r"]]
-        pval_indirect_r <- data_matrix_element[["pval_indirect_r"]]
+        pval_direct_r <- summary_obj.r[["z.avg.p"]]
+        pval_indirect_r <- summary_obj.r[["d.avg.p"]]
         
         # Add to the matrix
         if(pval_direct_r<alpha_level){mat_results[bM.ind,"DirectR"] <- mat_results[bM.ind,"DirectR"]+1 }

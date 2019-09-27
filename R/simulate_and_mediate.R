@@ -1,3 +1,4 @@
+#' @import mediation
 
 simulate_and_mediate <- function(data_element){
   use_cpp = data_element[["use_cpp"]]
@@ -30,17 +31,14 @@ simulate_and_mediate <- function(data_element){
     med.out <- mediate_with_rcpp(med.fit, out.fit, treat = "X",mediator = "M1",sims = nSimImai)
     med.out.r <- mediate_with_rcpp(med.fit.r, out.fit.r, treat = "X",mediator = "M2",sims = nSimImai)
   } else {
-    med.out <- mediation::mediate(med.fit, out.fit, treat = "X",mediator = "M1",sims = nSimImai)
-    med.out.r <- mediation::mediate(med.fit.r, out.fit.r, treat = "X",mediator = "M2",sims = nSimImai)
+    med.out <- mediate(med.fit, out.fit, treat = "X",mediator = "M1",sims = nSimImai)
+    med.out.r <- mediate(med.fit.r, out.fit.r, treat = "X",mediator = "M2",sims = nSimImai)
   }
   
-  summary_obj = mediation::summary.mediate(med.out)
-  summary_obj.r = mediation::summary.mediate(med.out.r)
   
-  result = list(pval_direct = summary_obj[["z.avg.p"]],
-                pval_indirect = summary_obj[["d.avg.p"]],
-                pval_direct_r = summary_obj.r[["z.avg.p"]],
-                pval_indirect_r = summary_obj.r[["d.avg.p"]])
+  
+  result = list(med.out = med.out,
+                med.out.r = med.out.r)
   
   if(!is.null(old_rand_state)){
     .GlobalEnv[[".Random.seed"]] = old_rand_state
