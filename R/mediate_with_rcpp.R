@@ -1,4 +1,5 @@
 #' @include pval.R
+#' @include simple_mediate_result.R
 
 #our calls always this style: mediate(model.m, model.y, treat= "X", mediator="M", sims = nSimImai)
 #both models are lm with no special types / conditions
