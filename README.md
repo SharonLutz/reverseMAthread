@@ -30,7 +30,7 @@ warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragma
 the reverseMAthread command accepts the following parameters:
 * use_multi_processing, a boolean (T, F, True, or False), which turns on the multi-processing feature
 * use_cpp, a boolean(T, F, True, or False), which activates the use of Rcpp RcppEigen, and threading if multiprocessing is not turned on as well.
-* num_jobs, an integer specifying the number of processes or threads you wish to use.
+* num_jobs, an integer specifying the number of processes or cpus/threads you wish to use.
 ```
 library(reverseMAthread)
 ?reverseMAthread # For details on this function
