@@ -30,7 +30,6 @@ Collate:
     'input_error_check.R'
     'pval.R'
     'mediate_with_rcpp.R'
-    'simulate_and_mediate.R'
     'multi_process_mediate.R'
     'reverseMAthread-internal.R'
     'reverseMAthread-package.R'

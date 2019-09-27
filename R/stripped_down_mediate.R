@@ -1,12 +1,8 @@
-#' @include pval.R
-
 #our calls always this style: mediate(model.m, model.y, treat= "X", mediator="M", sims = nSimImai)
 #both models are lm with no special types / conditions
-mediate_with_rcpp <- 
+stripped.down.mediate <- 
   function(model.m, model.y, sims = 1000, treat = "treat.name", mediator = "med.name",
            conf.level = .95, control.value = 0, treat.value = 1){
-  
-  num_threads = getOption("mediate.threads", default = 1)
   
   # Model frames for M and Y models
   m.data <- model.frame(model.m)  # Call.M$data
@@ -94,16 +90,58 @@ mediate_with_rcpp <-
   ##  Outcome Predictions
   #####################################
   
-  if(num_threads > 1){
-    threaded_mediate_helper(environment(), num_threads)
-  } else {
-    mediate_helper(environment())
+  
+  effects.tmp <- array(NA, dim = c(n, sims, 4))
+  
+  for(e in 1:4){
+    tt <- switch(e, c(1,1,1,0), c(0,0,1,0), c(1,0,1,1), c(1,0,0,0))
+    Pr1 <- matrix(nrow=n, ncol=sims)
+    Pr0 <- matrix(nrow=n, ncol=sims)
+    
+    for(j in 1:sims){
+      pred.data.t <- pred.data.c <- y.data
+      
+      # Set treatment values
+      cat.t <- ifelse(tt[1], cat.1, cat.0)
+      cat.c <- ifelse(tt[2], cat.1, cat.0)
+      cat.t.ctrl <- ifelse(tt[1], cat.0, cat.1)
+      cat.c.ctrl <- ifelse(tt[2], cat.0, cat.1)
+      
+      pred.data.t[,treat] <- cat.t
+      pred.data.c[,treat] <- cat.c
+      
+      # Set mediator values
+      PredictMt <- PredictM1[j,] * tt[3] + PredictM0[j,] * (1 - tt[3])
+      PredictMc <- PredictM1[j,] * tt[4] + PredictM0[j,] * (1 - tt[4])
+      
+      pred.data.t[,mediator] <- PredictMt
+      pred.data.c[,mediator] <- PredictMc
+      
+      ymat.t <- model.matrix(terms(model.y), data=pred.data.t)
+      ymat.c <- model.matrix(terms(model.y), data=pred.data.c)
+      
+      Pr1[,j] <- t(as.matrix(YModel[j,])) %*% t(ymat.t)
+      Pr0[,j] <- t(as.matrix(YModel[j,])) %*% t(ymat.c)
+      
+      rm(ymat.t, ymat.c, pred.data.t, pred.data.c)
+    }
+    
+    effects.tmp[,,e] <- Pr1 - Pr0 ### e=1:mediation(1); e=2:mediation(0); e=3:direct(1); e=4:direct(0)
+    rm(Pr1, Pr0)
   }
+  
+  rm(PredictM1, PredictM0, YModel, MModel)
+  
+  et1<-effects.tmp[,,1] ### mediation effect (1)
+  et2<-effects.tmp[,,2] ### mediation effect (0)
+  et3<-effects.tmp[,,3] ### direct effect (1)
+  et4<-effects.tmp[,,4] ### direct effect (0)
   
   delta.1 <- t(as.matrix(apply(et1, 2, weighted.mean, w=weights)))
   delta.0 <- t(as.matrix(apply(et2, 2, weighted.mean, w=weights)))
   zeta.1 <- t(as.matrix(apply(et3, 2, weighted.mean, w=weights)))
   zeta.0 <- t(as.matrix(apply(et4, 2, weighted.mean, w=weights)))
+  rm(effects.tmp)
   
   tau <- (zeta.1 + delta.0 + zeta.0 + delta.1)/2
   nu.0 <- delta.0/tau
@@ -142,21 +180,27 @@ mediate_with_rcpp <-
   n.avg.ci <- quantile(nu.avg, c(low,high), na.rm=TRUE)
   
   # p-values
-  d0.p <- mediate_pval(delta.0, d0)
-  d1.p <- mediate_pval(delta.1, d1)
-  d.avg.p <- mediate_pval(delta.avg, d.avg)
-  z0.p <- mediate_pval(zeta.0, z0)
-  z1.p <- mediate_pval(zeta.1, z1)
-  z.avg.p <- mediate_pval(zeta.avg, z.avg)        
-  n0.p <- mediate_pval(nu.0, n0)
-  n1.p <- mediate_pval(nu.1, n1)
-  n.avg.p <- mediate_pval(nu.avg, n.avg)
-  tau.p <- mediate_pval(tau, tau.coef)
+  d0.p <- mediation::pval(delta.0, d0)
+  d1.p <- mediation::pval(delta.1, d1)
+  d.avg.p <- mediation::pval(delta.avg, d.avg)
+  z0.p <- mediation::pval(zeta.0, z0)
+  z1.p <- mediation::pval(zeta.1, z1)
+  z.avg.p <- mediation::pval(zeta.avg, z.avg)        
+  n0.p <- mediation::pval(nu.0, n0)
+  n1.p <- mediation::pval(nu.1, n1)
+  n.avg.p <- mediation::pval(nu.avg, n.avg)
+  tau.p <- mediation::pval(tau, tau.coef)
   
   # Detect whether models include T-M interaction
   INT <- paste(treat,mediator,sep=":") %in% attr(terms(model.y),"term.labels") |
     paste(mediator,treat,sep=":") %in% attr(terms(model.y),"term.labels")
   
-  return(SimpleMediateResult(direct_p=z.avg.p, indirect_p=d.avg.p))
+  return(SimpleMediateResult(direct_p = z.avg.p, indirect_p=d.avg.p))
 }
 
+export_environment <- function(env){
+  glob_env = globalenv()
+  for(item in names(env)){
+    glob_env[[item]] = env[[item]]
+  }
+}
