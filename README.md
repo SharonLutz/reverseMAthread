@@ -24,18 +24,19 @@ The install process will involve compiling source code. If you are on MacOSX, th
 warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
 ```
 
-
-## Speeding things up with optional parameters:
-### MultiProcessing And/Or Use of Threading and Eigen via C++
+## Speeding things up with MultiProcessing And/Or Use of Threading and Eigen via C++
 the reverseMAthread command accepts the following parameters:
 * use_multi_processing, a boolean (T, F, True, or False), which turns on the multi-processing feature
 * use_cpp, a boolean(T, F, True, or False), which activates the use of Rcpp RcppEigen, and threading if multiprocessing is not turned on as well.
 * num_jobs, an integer specifying the number of processes or cpus/threads you wish to use.
+
+## Example
+
 ```
 library(reverseMAthread)
 ?reverseMAthread # For details on this function
 
-#Example Using Vanilla R without MultiProcessing:
+#Example Using Vanilla R (without Rcpp with Eigen or MultiProcessing):
 
 testRMA1 = reverseMAthread(n = 1000, pX = 0.2, gamma0 = 0, gammaX = 0.2, varM = 1, beta0 = 0, betaX = 0.2, 
 betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.pdf = T, 
