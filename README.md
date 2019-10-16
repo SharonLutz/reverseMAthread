@@ -1,6 +1,6 @@
 
 ## Extension of reverseMA with Threading
-These functions examines the performance of mediation analysis methods in the presence of reverse causality.
+These functions perform the same tasks as reverseMA but use threading to decrease computational time.
 
 ## Installation
 Requirements:
@@ -117,9 +117,6 @@ If your system is fairly low on available RAM, but you do have enough to run the
 
 If you force-stop an R terminal or R process that has already begun a multi-processing task, it may not be able to close all the child processes before it terminates. They will have to be stopped/killed before they will stop consuming CPU cycles and Memory and release the system resources.
 
-## Output
-
-<img src="plots/reverseMAplot.png" width="600">
 
 ## Warning: Do not try to access package internals directly or do so at your own risk!
 If you try to run methods/functions that are not exported and intended for end users, and feed these functions environments, parameters, or values that are not correctly formed, it could result in an uncaught or uncatchable C++ exception or segmentation fault. If this occurs, it will kill your R session/terminal and if you were working within RStudio it will probably crash too.
