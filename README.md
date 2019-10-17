@@ -34,7 +34,6 @@ the reverseMAthread command accepts the following parameters:
 
 ```
 library(reverseMAthread)
-?reverseMAthread # For details on this function
 
 #Example Using Vanilla R (without Rcpp with Eigen or MultiProcessing):
 
@@ -43,7 +42,6 @@ betaM = c(0.1, 0.2, 0.3), varY = 1, nSim = 100, nSimImai = 100, SEED = 1, plot.p
 plot.name = "reverseMAplot.pdf", alpha_level = 0.05)
 
 testRMA1
-
 
 #Example Using Rcpp with Eigen and 5 threads:
 
